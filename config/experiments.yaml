@@ -1,0 +1,57 @@
+# Experimentos de busca.
+# Rodar todos e comparar: python -m evaluation experiments
+#
+# Campos de cada experimento:
+#   exp_name         nome único
+#   collection       nome de uma estratégia de config/strategies.yaml
+#   search_type      hybrid (vetorial + por palavras), vector ou bm25
+#   match_count      máximo de trechos enviados ao modelo
+#   match_threshold  similaridade mínima de um trecho, de 0 a 1 (0 desliga; padrão 0)
+#   use_hyde         busca com uma resposta hipotética no lugar da pergunta (padrão false)
+
+# O experimento que o chat e a avaliação da resposta usam.
+# Para trocar a configuração do assistente, troque este nome.
+assistant: section_hybrid
+
+experiments:
+  # --- Comparação das estratégias de divisão: mesma busca, só a divisão muda ---
+  - exp_name: section_hybrid
+    collection: section
+    search_type: hybrid
+    match_count: 4
+    match_threshold: 0.0
+    use_hyde: false
+
+
+  - exp_name: page_hybrid
+    collection: page
+    search_type: hybrid
+    match_count: 4
+    match_threshold: 0.0
+    use_hyde: false
+
+  # --- Contribuição de cada busca, na estratégia do assistente ---
+  - exp_name: section_vector
+    collection: section
+    search_type: vector
+    match_count: 4
+
+  - exp_name: section_bm25
+    collection: section
+    search_type: bm25
+    match_count: 4
+
+  # --- Opções medidas em 10/10/2026 e não adotadas. Descomente para medir de novo. ---
+  # Threshold: com 0.6, a evidência deixou de chegar em mais 2 perguntas (35/38 contra 37/38).
+  - exp_name: section_hybrid_t60
+    collection: section
+    search_type: hybrid
+    match_count: 4
+    match_threshold: 0.6
+  
+  # HyDE: mesmo True Rate (37/38), com cerca de 1,7 s a mais por pergunta.
+  - exp_name: section_hybrid_hyde
+    collection: section
+    search_type: hybrid
+    match_count: 4
+    use_hyde: true
