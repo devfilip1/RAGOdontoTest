@@ -1,4 +1,4 @@
-"""Onde fica o índice de cada estratégia e se ele ainda corresponde à estratégia declarada e ao material."""
+"""Where the index of each strategy lives and whether it still matches the declared strategy and the brochure."""
 import hashlib
 import json
 from datetime import datetime
@@ -10,7 +10,7 @@ CURRENT, STALE, MISSING = "current", "stale", "missing"
 
 
 class IndexUnavailable(Exception):
-    """O índice de uma estratégia está ausente ou desatualizado. A mensagem traz o comando que resolve."""
+    """The index of a strategy is missing or out of date. The message carries the command that fixes it."""
 
 
 def index_dir(name, base=None):
@@ -38,7 +38,7 @@ def ingest_command(name):
 
 
 def write_manifest(strategy, chunk_count, base=None, source=None, embedding_model=None):
-    """Registra com que definição, material e modelo o índice foi criado."""
+    """Records which definition, brochure, and model the index was built with."""
     manifest = {
         "strategy": strategy.name,
         "definition_hash": strategy.definition_hash(),
@@ -64,28 +64,28 @@ def read_manifest(name, base=None):
 
 
 def index_state(strategy, base=None, source=None, embedding_model=None):
-    """Devolve (estado, motivo). O motivo é None quando o índice está atual."""
+    """Returns (state, reason). The reason is None when the index is current."""
     manifest = read_manifest(strategy.name, base)
     command = ingest_command(strategy.name)
     if manifest is None or not chunks_path(strategy.name, base).is_file():
-        return MISSING, f"o índice da estratégia \"{strategy.name}\" ainda não foi criado; rode: {command}"
+        return MISSING, f"the index of strategy \"{strategy.name}\" has not been built yet; run: {command}"
 
     changed = []
     if manifest.get("definition_hash") != strategy.definition_hash():
-        changed.append("a definição da estratégia mudou")
+        changed.append("the strategy definition changed")
     if manifest.get("source_hash") != (source or source_hash()):
-        changed.append("o material da clínica mudou")
+        changed.append("the brochure changed")
     if manifest.get("embedding_model") != (embedding_model or OLLAMA_EMBEDDING_MODEL):
-        changed.append("o modelo de embedding mudou")
+        changed.append("the embedding model changed")
     if changed:
         return STALE, (
-            f"o índice da estratégia \"{strategy.name}\" está desatualizado ({' e '.join(changed)}); rode: {command}"
+            f"the index of strategy \"{strategy.name}\" is out of date ({' and '.join(changed)}); run: {command}"
         )
     return CURRENT, None
 
 
 def require_index(strategy, base=None):
-    """Levanta IndexUnavailable se o índice não puder ser usado."""
+    """Raises IndexUnavailable if the index cannot be used."""
     state, reason = index_state(strategy, base)
     if state != CURRENT:
         raise IndexUnavailable(reason)

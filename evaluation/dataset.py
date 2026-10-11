@@ -1,4 +1,4 @@
-"""Gabarito de perguntas: carga, validação e recortes."""
+"""Answer key of questions: loading, validation, and subsets."""
 import hashlib
 import json
 from collections import Counter
@@ -11,16 +11,19 @@ import jsonschema
 from evaluation.normalize import FACT_UNITS, extract_values, normalize_text
 
 PACKAGE_DIR = Path(__file__).parent
-GABARITO_PATH = PACKAGE_DIR / "data" / "gabarito.json"
-SCHEMA_PATH = PACKAGE_DIR / "schemas" / "gabarito.schema.json"
+ANSWER_KEY_PATH = PACKAGE_DIR / "data" / "answer_key.json"
+SCHEMA_PATH = PACKAGE_DIR / "schemas" / "answer_key.schema.json"
 
-MIN_ITEMS = 40
+MIN_ITEMS = 60
 MIN_UNANSWERABLE = 6
+MIN_CLINIC_INFO = 8
 REQUIRED_CATEGORIES_PER_PROCEDURE = ("price", "duration", "result")
+# entries of "procedures" that are not treatments: they have anchors, but no price, duration, or result
+NON_TREATMENT_PROCEDURES = ("clinic",)
 SUBSETS = ("dev", "holdout", "smoke")
 
 
-class GabaritoError(Exception):
+class AnswerKeyError(Exception):
     def __init__(self, problems):
         super().__init__("\n".join(problems))
         self.problems = problems
@@ -35,9 +38,9 @@ class Fact:
     alternatives: tuple = ()
 
     def targets(self):
-        """Chaves (kind, valor, unidade) no mesmo formato de normalize.Value.key."""
-        if self.type == "money":
-            return [("money", round(float(v), 2), None) for v in self.values]
+        """Keys (kind, value, unit) in the same format as normalize.Value.key."""
+        if self.type in ("money", "time"):
+            return [(self.type, round(float(v), 2), None) for v in self.values]
         if self.type == "duration":
             factor, unit = FACT_UNITS[self.unit]
             return [("duration", round(float(v) * factor, 2), unit) for v in self.values]
@@ -61,10 +64,10 @@ class Item:
 
 
 @dataclass(frozen=True)
-class Gabarito:
+class AnswerKey:
     version: str
     hash: str
-    procedures: dict = field(default_factory=dict)  # nome -> lista de âncoras
+    procedures: dict = field(default_factory=dict)  # name -> list of anchors
     items: tuple = ()
 
     def by_id(self):
@@ -84,12 +87,12 @@ def _fact(raw):
     )
 
 
-def parse_gabarito(data, file_hash=""):
-    """Monta o gabarito a partir do JSON já lido. Levanta GabaritoError se fugir do esquema."""
+def parse_answer_key(data, file_hash=""):
+    """Builds the answer key from the JSON already read. Raises AnswerKeyError if it does not follow the schema."""
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     errors = sorted(jsonschema.Draft202012Validator(schema).iter_errors(data), key=lambda e: list(e.path))
     if errors:
-        raise GabaritoError([f"esquema: {'/'.join(map(str, e.path)) or '(raiz)'}: {e.message}" for e in errors])
+        raise AnswerKeyError([f"schema: {'/'.join(map(str, e.path)) or '(root)'}: {e.message}" for e in errors])
 
     items = tuple(
         Item(
@@ -109,17 +112,17 @@ def parse_gabarito(data, file_hash=""):
         for raw in data["items"]
     )
     procedures = {name: list(value["anchors"]) for name, value in data["procedures"].items()}
-    return Gabarito(version=data["version"], hash=file_hash, procedures=procedures, items=items)
+    return AnswerKey(version=data["version"], hash=file_hash, procedures=procedures, items=items)
 
 
-def load_gabarito(path=GABARITO_PATH):
+def load_answer_key(path=ANSWER_KEY_PATH):
     raw = Path(path).read_bytes()
-    return parse_gabarito(json.loads(raw.decode("utf-8")), hashlib.sha256(raw).hexdigest())
+    return parse_answer_key(json.loads(raw.decode("utf-8")), hashlib.sha256(raw).hexdigest())
 
 
 @lru_cache(maxsize=1)
 def load_source_text():
-    """Texto completo do material da clínica, página a página."""
+    """Full text of the clinic brochure, page by page."""
     from pypdf import PdfReader
 
     from assistant.config import SOURCE_PDF
@@ -127,30 +130,30 @@ def load_source_text():
     return "\n".join(page.extract_text() for page in PdfReader(SOURCE_PDF).pages)
 
 
-def validate(gabarito, source_text, check_coverage=True):
-    """Aplica as regras de validação do data-model. Devolve a lista de problemas."""
+def validate(answer_key, source_text, check_coverage=True):
+    """Applies the validation rules of the answer key. Returns the list of problems."""
     problems = []
     source = normalize_text(source_text)
-    by_id = gabarito.by_id()
+    by_id = answer_key.by_id()
 
-    for item_id, count in Counter(item.id for item in gabarito.items).items():
+    for item_id, count in Counter(item.id for item in answer_key.items).items():
         if count > 1:
-            problems.append(f"{item_id}: id repetido {count} vezes")
+            problems.append(f"{item_id}: id repeated {count} times")
 
-    for item in gabarito.items:
+    for item in answer_key.items:
         if item.answerable:
             if not item.expected_facts:
-                problems.append(f"{item.id}: pergunta com resposta precisa de ao menos um fato esperado")
+                problems.append(f"{item.id}: an answerable question needs at least one expected fact")
             if not item.evidence:
-                problems.append(f"{item.id}: pergunta com resposta precisa de ao menos uma evidência")
+                problems.append(f"{item.id}: an answerable question needs at least one evidence quote")
         elif item.expected_facts or item.evidence:
-            problems.append(f"{item.id}: pergunta sem resposta não pode ter fatos esperados nem evidência")
+            problems.append(f"{item.id}: an unanswerable question cannot have expected facts or evidence")
 
         for evidence in item.evidence:
             occurrences = source.count(normalize_text(evidence))
             if occurrences != 1:
                 problems.append(
-                    f"{item.id}: a evidência \"{evidence}\" aparece {occurrences} vezes no material (precisa ser 1)"
+                    f"{item.id}: the evidence \"{evidence}\" appears {occurrences} times in the brochure (must be 1)"
                 )
 
         evidence_values = {v.key for evidence in item.evidence for v in extract_values(evidence)}
@@ -158,49 +161,54 @@ def validate(gabarito, source_text, check_coverage=True):
             for target in fact.targets():
                 if target not in evidence_values:
                     problems.append(
-                        f"{item.id}: o valor {target[1]:g} do fato \"{fact.label}\" não está em nenhuma evidência do item"
+                        f"{item.id}: the value {target[1]:g} of the fact \"{fact.label}\" is not in any evidence of the item"
                     )
 
-        if item.procedure is not None and item.procedure not in gabarito.procedures:
-            problems.append(f"{item.id}: procedimento \"{item.procedure}\" não existe em procedures")
+        if item.procedure is not None and item.procedure not in answer_key.procedures:
+            problems.append(f"{item.id}: procedure \"{item.procedure}\" does not exist in procedures")
 
         if item.variant_of is not None:
             original = by_id.get(item.variant_of)
             if original is None:
-                problems.append(f"{item.id}: variant_of aponta para \"{item.variant_of}\", que não existe")
+                problems.append(f"{item.id}: variant_of points to \"{item.variant_of}\", which does not exist")
             elif original.split != item.split:
-                problems.append(f"{item.id}: variant_of aponta para item de outro split ({original.split})")
+                problems.append(f"{item.id}: variant_of points to an item of another split ({original.split})")
 
     if check_coverage:
-        if len(gabarito.items) < MIN_ITEMS:
-            problems.append(f"cobertura: {len(gabarito.items)} itens (mínimo {MIN_ITEMS})")
-        for procedure in gabarito.procedures:
-            categories = {item.category for item in gabarito.items if item.procedure == procedure}
+        if len(answer_key.items) < MIN_ITEMS:
+            problems.append(f"coverage: {len(answer_key.items)} items (minimum {MIN_ITEMS})")
+        for procedure in answer_key.procedures:
+            if procedure in NON_TREATMENT_PROCEDURES:
+                continue
+            categories = {item.category for item in answer_key.items if item.procedure == procedure}
             for category in REQUIRED_CATEGORIES_PER_PROCEDURE:
                 if category not in categories:
-                    problems.append(f"cobertura: procedimento \"{procedure}\" sem item de {category}")
-        unanswerable = sum(1 for item in gabarito.items if not item.answerable)
+                    problems.append(f"coverage: procedure \"{procedure}\" has no {category} item")
+        unanswerable = sum(1 for item in answer_key.items if not item.answerable)
         if unanswerable < MIN_UNANSWERABLE:
-            problems.append(f"cobertura: {unanswerable} itens sem resposta no material (mínimo {MIN_UNANSWERABLE})")
+            problems.append(f"coverage: {unanswerable} items with no answer in the brochure (minimum {MIN_UNANSWERABLE})")
+        clinic_info = sum(1 for item in answer_key.items if item.category == "clinic_info")
+        if clinic_info < MIN_CLINIC_INFO:
+            problems.append(f"coverage: {clinic_info} clinic_info items (minimum {MIN_CLINIC_INFO})")
 
     return problems
 
 
-def select_subset(gabarito, subset):
-    """dev e holdout são os dois recortes; smoke é a amostra pequena do dev."""
+def select_subset(answer_key, subset):
+    """dev and holdout are the two splits; smoke is the small sample of dev."""
     if subset == "smoke":
-        return [item for item in gabarito.items if item.smoke and item.split == "dev"]
+        return [item for item in answer_key.items if item.smoke and item.split == "dev"]
     if subset in ("dev", "holdout"):
-        return [item for item in gabarito.items if item.split == subset]
-    raise ValueError(f"recorte desconhecido: {subset}")
+        return [item for item in answer_key.items if item.split == subset]
+    raise ValueError(f"unknown subset: {subset}")
 
 
-def coverage(gabarito):
+def coverage(answer_key):
     return {
-        "total": len(gabarito.items),
-        "unanswerable": sum(1 for item in gabarito.items if not item.answerable),
-        "by_category": dict(Counter(item.category for item in gabarito.items)),
-        "by_procedure": dict(Counter(item.procedure or "(geral)" for item in gabarito.items)),
-        "by_split": dict(Counter(item.split for item in gabarito.items)),
-        "smoke": len(select_subset(gabarito, "smoke")),
+        "total": len(answer_key.items),
+        "unanswerable": sum(1 for item in answer_key.items if not item.answerable),
+        "by_category": dict(Counter(item.category for item in answer_key.items)),
+        "by_procedure": dict(Counter(item.procedure or "(general)" for item in answer_key.items)),
+        "by_split": dict(Counter(item.split for item in answer_key.items)),
+        "smoke": len(select_subset(answer_key, "smoke")),
     }

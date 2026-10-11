@@ -1,4 +1,4 @@
-"""Conferência do juiz contra a avaliação de uma pessoa (FR-014)."""
+"""Checking the judge against the evaluation of a person."""
 import json
 from pathlib import Path
 
@@ -11,7 +11,7 @@ MIN_AGREEMENT = 0.8
 
 
 def build_sample(run, items_by_id, size=20):
-    """Amostra distribuída por tipo de pergunta, sem as notas do juiz e com os campos humanos vazios."""
+    """Sample spread across question types, without the judge's verdicts and with the human fields empty."""
     by_category = {}
     for result in run["results"]:
         if result["judge"]:
@@ -25,7 +25,7 @@ def build_sample(run, items_by_id, size=20):
 
     return {
         "run_id": run["run_id"],
-        "instructions": "Preencha cada critério em \"human\" com true (atende) ou false (não atende).",
+        "instructions": "Fill each criterion under \"human\" with true (meets it) or false (does not).",
         "criteria": {name: spec["rubric"] for name, spec in CRITERIA.items()},
         "samples": [
             {
@@ -47,7 +47,7 @@ def export_sample(run, items_by_id, size=20, path=LABELS_PATH):
 
 
 def score_agreement(labels, run):
-    """Concordância entre a pessoa e o juiz, por critério. Campos não preenchidos são ignorados."""
+    """Agreement between the person and the judge, per criterion. Fields left empty are ignored."""
     judged = {result["item_id"]: result["judge"] for result in run["results"] if result["judge"]}
     criteria = {}
     for criterion in CRITERIA:
@@ -75,7 +75,7 @@ def save_agreement(agreement, path=AGREEMENT_PATH):
 
 
 def load_agreement(judge_model, path=AGREEMENT_PATH):
-    """Concordância por critério para o modelo de juiz informado; {} se não houver conferência dele."""
+    """Agreement per criterion for the given judge model; {} if it has not been checked."""
     path = Path(path)
     if not path.is_file():
         return {}

@@ -1,4 +1,4 @@
-"""Histórico das execuções: gravar, listar e marcar a referência."""
+"""History of the runs: saving, listing, and setting the reference."""
 import hashlib
 import json
 import re
@@ -29,8 +29,9 @@ def _git(*args):
 
 
 def snapshot_config(rag_config, judge_model=None):
-    """Configuração do assistente gravada junto com cada execução (data-model)."""
+    """Configuration of the assistant saved with each run."""
     from assistant.index import chunks_path
+    from assistant.pipeline import prompt_text
     from assistant.settings import get_strategy
 
     parameters = get_strategy(rag_config.strategy).parameters
@@ -44,7 +45,8 @@ def snapshot_config(rag_config, judge_model=None):
         "match_count": rag_config.match_count,
         "match_threshold": rag_config.match_threshold,
         "use_hyde": rag_config.use_hyde,
-        # tamanho máximo e sobreposição dos trechos, quando a estratégia tem esses parâmetros
+        "prompt": rag_config.prompt,
+        # maximum size and overlap of the chunks, when the strategy has these parameters
         "chunk_size": parameters.get("chunk_size", parameters.get("max_chars")),
         "chunk_overlap": parameters.get("chunk_overlap", parameters.get("overlap")),
         "vector_k": rag_config.vector_k,
@@ -55,7 +57,7 @@ def snapshot_config(rag_config, judge_model=None):
         "temperature": rag_config.temperature,
         "seed": rag_config.seed,
         "num_ctx": None,
-        "prompt_hash": _sha(rag_config.prompt_template + rag_config.user_template),
+        "prompt_hash": _sha(prompt_text(rag_config)),
         "kb_hash": _sha("\n\x00".join(chunks)),
         "kb_chunk_count": len(chunks),
         "judge_model": judge_model,
@@ -74,7 +76,7 @@ def new_run_id(label=None, now=None):
 
 
 def save_run(run, runs_dir=RUNS_DIR):
-    """Grava a execução. Incompletas vão para _incomplete/ e ficam fora do histórico (FR-022)."""
+    """Saves the run. Incomplete ones go to _incomplete/ and stay out of the history."""
     schema = json.loads(RUN_SCHEMA_PATH.read_text(encoding="utf-8"))
     jsonschema.validate(run, schema)
 
@@ -90,12 +92,12 @@ def save_run(run, runs_dir=RUNS_DIR):
 def load_run(run_id, runs_dir=RUNS_DIR):
     path = Path(runs_dir) / run_id / "run.json"
     if run_id == INCOMPLETE_DIR or not path.is_file():
-        raise FileNotFoundError(f"execução \"{run_id}\" não encontrada em {runs_dir}")
+        raise FileNotFoundError(f"run \"{run_id}\" not found in {runs_dir}")
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def list_runs(runs_dir=RUNS_DIR):
-    """Execuções completas, da mais recente para a mais antiga."""
+    """Complete runs, from the most recent to the oldest."""
     folder = Path(runs_dir)
     if not folder.is_dir():
         return []
@@ -116,17 +118,17 @@ def _read_baseline(runs_dir):
 
 
 def get_baseline(subset, runs_dir=RUNS_DIR):
-    """Id da execução de referência do recorte, ou None."""
+    """Id of the reference run of the subset, or None."""
     return _read_baseline(runs_dir).get(subset)
 
 
 def set_baseline(run_id, runs_dir=RUNS_DIR):
-    """Marca a execução como referência do recorte dela. Só aceita execução completa."""
+    """Sets the run as the reference of its subset. Only accepts a complete run."""
     run = load_run(run_id, runs_dir)
     if run["status"] != "complete":
-        raise ValueError(f"a execução \"{run_id}\" está incompleta e não pode ser referência")
+        raise ValueError(f"the run \"{run_id}\" is incomplete and cannot be the reference")
     if run["subset"] not in BASELINE_SUBSETS:
-        raise ValueError(f"a execução \"{run_id}\" é do recorte {run['subset']}; a referência é por dev ou holdout")
+        raise ValueError(f"the run \"{run_id}\" is of the {run['subset']} subset; the reference is set per dev or holdout")
 
     baseline = _read_baseline(runs_dir)
     baseline[run["subset"]] = run_id

@@ -1,7 +1,7 @@
-"""Juiz local para os critérios subjetivos (research D8).
+"""Local judge for the subjective criteria.
 
-Uma chamada por critério, resposta binária com esquema JSON. As notas do juiz ficam em bloco
-separado do placar e nunca entram no "acertou/errou" do item.
+One call per criterion, a yes/no answer with a JSON schema. The judge's verdicts stay in a separate block
+of the scoreboard and never enter the right/wrong of the item.
 """
 import json
 import os
@@ -11,60 +11,60 @@ JUDGE_SEED = 42
 
 CRITERIA = {
     "relevance": {
-        "label": "Relevância",
-        "rubric": "A resposta trata do que o cliente perguntou. Dizer que não tem a informação pedida também é tratar da pergunta.",
-        "yes": "Pergunta: \"Quanto custa a limpeza?\" Resposta: \"A limpeza custa de R$ 120 a R$ 250.\"",
-        "no": "Pergunta: \"Quanto custa a limpeza?\" Resposta: \"O implante é uma solução definitiva para o seu sorriso.\"",
+        "label": "Relevance",
+        "rubric": "The answer deals with what the customer asked. Saying it does not have the requested information also deals with the question.",
+        "yes": "Question: \"How much is a dental cleaning?\" Answer: \"A dental cleaning costs $40–$85.\"",
+        "no": "Question: \"How much is a dental cleaning?\" Answer: \"Dental implants are a long-term solution for your smile.\"",
     },
     "tone": {
-        "label": "Tom",
-        "rubric": "O tom é cordial e profissional, como o de um atendente de clínica falando com um cliente.",
-        "yes": "\"Claro! A limpeza leva de 30 a 50 minutos. Posso ajudar com mais alguma dúvida?\"",
-        "no": "\"Já falei que não sei. Leia o site.\"",
+        "label": "Tone",
+        "rubric": "The tone is friendly and professional, like a clinic attendant talking to a customer.",
+        "yes": "\"Of course! A dental cleaning takes 30–50 minutes. Can I help with anything else?\"",
+        "no": "\"I already said I don't know. Read the website.\"",
     },
     "scheduling": {
-        "label": "Condução para o agendamento",
-        "rubric": "A resposta convida o cliente, de forma explícita, a agendar uma consulta ou avaliação.",
-        "yes": "\"O clareamento custa de R$ 500 a R$ 1.500. Vamos agendar sua avaliação?\"",
-        "no": "\"O clareamento custa de R$ 500 a R$ 1.500.\"",
+        "label": "Leading to scheduling",
+        "rubric": "The answer explicitly invites the customer to schedule an appointment or an assessment.",
+        "yes": "\"Teeth whitening costs $180–$450. Shall we schedule your assessment?\"",
+        "no": "\"Teeth whitening costs $180–$450.\"",
     },
     "conciseness": {
-        "label": "Objetividade",
-        "rubric": "A resposta é direta: entrega a informação sem rodeios, sem repetir a pergunta e sem listar informações que não foram pedidas.",
-        "yes": "\"A extração simples custa de R$ 150 a R$ 300.\"",
-        "no": "\"Você perguntou quanto custa a extração. Essa é uma ótima pergunta! Antes de responder, vale explicar todos os nossos procedimentos...\"",
+        "label": "Conciseness",
+        "rubric": "The answer is direct: it gives the information without detours, without repeating the question, and without listing information that was not asked for.",
+        "yes": "\"A simple extraction costs $50–$90.\"",
+        "no": "\"You asked how much an extraction costs. That is a great question! Before answering, it is worth explaining all of our procedures...\"",
     },
     "faithfulness": {
-        "label": "Fidelidade (afirmações)",
-        "rubric": "Tudo o que a resposta afirma sobre a clínica e os procedimentos está nos trechos disponíveis. Convites para agendar e frases de cortesia não contam como afirmação.",
-        "yes": "Trecho: \"Tempo: 3 a 6 meses\". Resposta: \"O implante leva de 3 a 6 meses.\"",
-        "no": "Trecho: \"Tempo: 3 a 6 meses\". Resposta: \"O implante leva de 3 a 6 meses e é feito com anestesia geral.\"",
+        "label": "Faithfulness (claims)",
+        "rubric": "Everything the answer claims about the clinic and the procedures is in the available chunks. Invitations to schedule and courtesy phrases do not count as claims.",
+        "yes": "Chunk: \"Duration: 3–6 months\". Answer: \"Dental implants take 3–6 months.\"",
+        "no": "Chunk: \"Duration: 3–6 months\". Answer: \"Dental implants take 3–6 months and are done under general anesthesia.\"",
         "needs_chunks": True,
     },
 }
 
 RESPONSE_SCHEMA = {
     "type": "object",
-    "properties": {"motivo": {"type": "string"}, "veredito": {"type": "boolean"}},
-    "required": ["motivo", "veredito"],
+    "properties": {"reason": {"type": "string"}, "verdict": {"type": "boolean"}},
+    "required": ["reason", "verdict"],
 }
 
-PROMPT = """Você é um avaliador rigoroso das respostas do assistente virtual de uma clínica odontológica.
-Avalie apenas o critério abaixo e responda em JSON.
+PROMPT = """You are a strict reviewer of the answers given by the virtual assistant of a dental clinic.
+Evaluate only the criterion below and answer in JSON.
 
-CRITÉRIO: {label}
+CRITERION: {label}
 {rubric}
 
-Exemplo que atende ao critério: {yes}
-Exemplo que não atende ao critério: {no}
+Example that meets the criterion: {yes}
+Example that does not meet the criterion: {no}
 
-PERGUNTA DO CLIENTE:
+CUSTOMER QUESTION:
 {question}
 {chunks}
-RESPOSTA DO ASSISTENTE:
+ASSISTANT ANSWER:
 {answer}
 
-Escreva o motivo em uma frase curta e depois o veredito: true se a resposta atende ao critério, false se não atende."""
+Write the reason in one short sentence and then the verdict: true if the answer meets the criterion, false if it does not."""
 
 
 def judge_model_name(chat_model):
@@ -75,7 +75,7 @@ def build_prompt(criterion, question, answer, chunks):
     spec = CRITERIA[criterion]
     chunk_block = ""
     if spec.get("needs_chunks"):
-        chunk_block = "\nTRECHOS DISPONÍVEIS AO ASSISTENTE:\n" + "\n---\n".join(chunks) + "\n"
+        chunk_block = "\nCHUNKS AVAILABLE TO THE ASSISTANT:\n" + "\n---\n".join(chunks) + "\n"
     return PROMPT.format(
         label=spec["label"], rubric=spec["rubric"], yes=spec["yes"], no=spec["no"],
         question=question, answer=answer, chunks=chunk_block,
@@ -83,19 +83,19 @@ def build_prompt(criterion, question, answer, chunks):
 
 
 def parse_verdict(content):
-    """Lê a saída do juiz. JSON inválido vira veredito None, sem derrubar a execução."""
+    """Reads the judge's output. Invalid JSON becomes a None verdict, without bringing the run down."""
     try:
         data = json.loads(content)
-        verdict = data["veredito"]
+        verdict = data["verdict"]
         if not isinstance(verdict, bool):
-            raise ValueError(f"veredito não é booleano: {verdict!r}")
-        return {"verdict": verdict, "reason": str(data.get("motivo", ""))}
+            raise ValueError(f"verdict is not a boolean: {verdict!r}")
+        return {"verdict": verdict, "reason": str(data.get("reason", ""))}
     except (ValueError, KeyError, TypeError) as error:
-        return {"verdict": None, "reason": f"saída inválida do juiz: {error}"}
+        return {"verdict": None, "reason": f"invalid judge output: {error}"}
 
 
 def make_judge(model, host=None, chat=None):
-    """Devolve judge(question, answer, chunks) -> {critério: {verdict, reason}}."""
+    """Returns judge(question, answer, chunks) -> {criterion: {verdict, reason}}."""
     if chat is None:
         import ollama
 

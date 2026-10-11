@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Experimentos de busca (config/experiments.yaml)",
+  "title": "Search experiments (config/experiments.yaml)",
   "type": "object",
   "required": ["assistant", "experiments"],
   "additionalProperties": false,
@@ -23,7 +23,8 @@
         "search_type": { "enum": ["hybrid", "vector", "bm25"] },
         "match_count": { "type": "integer", "minimum": 1, "maximum": 20 },
         "match_threshold": { "type": "number", "minimum": 0, "maximum": 1 },
-        "use_hyde": { "type": "boolean" }
+        "use_hyde": { "type": "boolean" },
+        "prompt": { "enum": ["rules", "original"] }
       }
     }
   }

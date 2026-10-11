@@ -1,7 +1,7 @@
-"""Comparação entre duas execuções."""
+"""Comparison between two runs."""
 from evaluation.aggregate import flatten
 
-# Pequena folga para diferenças de ponto flutuante.
+# Small slack for floating-point differences.
 EPSILON = 1e-9
 
 
@@ -11,7 +11,7 @@ def _spread(run, name):
 
 
 def compare(base, candidate):
-    """Devolve a "Comparação" do data-model. Recortes diferentes não são comparáveis."""
+    """Returns the comparison between two runs. Different subsets are not comparable."""
     comparison = {
         "base": base["run_id"],
         "candidate": candidate["run_id"],
@@ -27,8 +27,8 @@ def compare(base, candidate):
     if base["subset"] != candidate["subset"]:
         comparison["comparable"] = False
         comparison["reason"] = (
-            f"recortes diferentes: {base['run_id']} é {base['subset']} e "
-            f"{candidate['run_id']} é {candidate['subset']}"
+            f"different subsets: {base['run_id']} is {base['subset']} and "
+            f"{candidate['run_id']} is {candidate['subset']}"
         )
         return comparison
 
@@ -36,12 +36,12 @@ def compare(base, candidate):
     candidate_results = {result["item_id"]: result for result in candidate["results"]}
     common = [item_id for item_id in base_results if item_id in candidate_results]
 
-    if base["gabarito_hash"] != candidate["gabarito_hash"]:
+    if base["answer_key_hash"] != candidate["answer_key_hash"]:
         left_out = len(set(base_results) ^ set(candidate_results))
         comparison["warnings"].append(
-            f"o gabarito mudou entre as execuções ({base['gabarito_version']} → "
-            f"{candidate['gabarito_version']}): as métricas não são diretamente comparáveis; "
-            f"a comparação por pergunta usa os {len(common)} itens em comum e deixa {left_out} de fora"
+            f"the answer key changed between the runs ({base['answer_key_version']} → "
+            f"{candidate['answer_key_version']}): the metrics are not directly comparable; "
+            f"the per-question comparison uses the {len(common)} items in common and leaves {left_out} out"
         )
 
     base_flat = flatten(base["metrics"])

@@ -1,26 +1,26 @@
-﻿# Atalhos para os comandos do projeto. Uso: .\run.ps1 <atalho> [argumentos]
-# Os mesmos nomes existem no Makefile; um teste confere que os dois arquivos não divergem.
+﻿# Shortcuts for the project commands. Usage: .\run.ps1 <shortcut> [arguments]
+# The same names exist in the Makefile; a test checks that the two files do not drift apart.
 
 $Shortcuts = [ordered]@{
-    "help"             = @("", "Lista os atalhos")
-    "install"          = @("-m pip install -r requirements.txt", "Instala as dependências")
-    "ingest"           = @("-m assistant.ingest", "Cria os índices de todas as estratégias")
-    "chat"             = @("-m assistant.chat", "Conversa com o assistente")
-    "test"             = @("-m pytest", "Testes de unidade (sem Ollama)")
-    "test-integration" = @("-m pytest -m integration", "Testes com o Ollama e o índice")
-    "eval"             = @("-m evaluation run --no-judge", "Avaliação da resposta, sem o juiz")
-    "eval-smoke"       = @("-m evaluation run --smoke --no-judge", "Avaliação rápida, 10 perguntas")
-    "eval-full"        = @("-m evaluation run", "Avaliação da resposta, com o juiz")
-    "experiments"      = @("-m evaluation experiments", "Compara os experimentos de busca")
-    "retrieval"        = @("-m evaluation retrieval", "Detalhe da busca do experimento do assistente")
-    "kb-check"         = @("-m evaluation kb-check", "Verifica a base de conhecimento")
-    "validate"         = @("-m evaluation validate", "Valida a configuração e o gabarito")
-    "compare"          = @("-m evaluation compare", "Compara a última avaliação com a referência")
-    "baseline"         = @("-m evaluation baseline set", "Marca a última avaliação como referência")
+    "help"             = @("", "List the shortcuts")
+    "install"          = @("-m pip install -r requirements.txt", "Install the dependencies")
+    "ingest"           = @("-m assistant.ingest", "Build the indexes of every strategy")
+    "chat"             = @("-m assistant.chat", "Chat with the assistant")
+    "test"             = @("-m pytest", "Unit tests (no Ollama needed)")
+    "test-integration" = @("-m pytest -m integration", "Tests with Ollama and the index")
+    "eval"             = @("-m evaluation run --no-judge", "Answer evaluation, without the judge")
+    "eval-smoke"       = @("-m evaluation run --smoke --no-judge", "Quick evaluation, 10 questions")
+    "eval-full"        = @("-m evaluation run", "Answer evaluation, with the judge")
+    "experiments"      = @("-m evaluation experiments", "Compare the search experiments")
+    "retrieval"        = @("-m evaluation retrieval", "Search detail of the assistant's experiment")
+    "kb-check"         = @("-m evaluation kb-check", "Check the knowledge base")
+    "validate"         = @("-m evaluation validate", "Validate the configuration and the answer key")
+    "compare"          = @("-m evaluation compare", "Compare the latest evaluation with the reference")
+    "baseline"         = @("-m evaluation baseline set", "Set the latest evaluation as the reference")
 }
 
 function Show-Shortcuts {
-    Write-Host "Uso: .\run.ps1 <atalho> [argumentos]"
+    Write-Host "Usage: .\run.ps1 <shortcut> [arguments]"
     Write-Host ""
     foreach ($name in $Shortcuts.Keys) {
         Write-Host ("  {0,-18} {1}" -f $name, $Shortcuts[$name][1])
@@ -36,7 +36,7 @@ if ($name -eq "help") {
 }
 
 if (-not $Shortcuts.Contains($name)) {
-    Write-Host "O atalho '$name' não existe."
+    Write-Host "The shortcut '$name' does not exist."
     Write-Host ""
     Show-Shortcuts
     exit 2
@@ -44,8 +44,8 @@ if (-not $Shortcuts.Contains($name)) {
 
 $python = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path $python)) {
-    Write-Host "Ambiente virtual não encontrado. Crie com: python -m venv .venv"
-    Write-Host "Depois instale as dependências: .\run.ps1 install"
+    Write-Host "Virtual environment not found. Create it with: python -m venv .venv"
+    Write-Host "Then install the dependencies: .\run.ps1 install"
     exit 1
 }
 
@@ -53,7 +53,7 @@ Push-Location $PSScriptRoot
 try {
     $command = $Shortcuts[$name][0] -split " "
     if ([Console]::IsInputRedirected) {
-        $input | & $python @command @rest   # repassa a entrada quando o atalho recebe texto por pipe
+        $input | & $python @command @rest   # forwards the input when the shortcut receives text through a pipe
     }
     else {
         & $python @command @rest

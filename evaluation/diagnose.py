@@ -1,13 +1,13 @@
-"""Causa principal de cada resposta errada (research D14)."""
+"""Main cause of each wrong answer."""
 
 CAUSES = ("retrieval_failure", "answer_failure", "fabricated", "wrong_refusal", "rule_violation")
 
 
 def classify(item, result, other_procedure_labels=()):
-    """Devolve (causa, sinais). A causa é None quando o item passou.
+    """Returns (cause, flags). The cause is None when the item passed.
 
-    result: dict com passed, retrieval, facts, unexpected_values, ungrounded_values, abstained, rule_violations.
-    other_procedure_labels: valores inesperados que são fato de outro procedimento.
+    result: dict with passed, retrieval, facts, unexpected_values, ungrounded_values, abstained, rule_violations.
+    other_procedure_labels: unexpected values that are a fact of another procedure.
     """
     flags = []
     fused = (result.get("retrieval") or {}).get("fused")

@@ -80,15 +80,15 @@ def test_definition_hash_changes_only_with_the_definition():
 @pytest.mark.parametrize(
     "old, new, expected",
     [
-        ("name: page", "name: section", ["section", "repetido"]),
+        ("name: page", "name: section", ["section", "duplicate"]),
         ("type: page", "type: semantic", ["page", "semantic", "section, split, page"]),
         ("chunk_size: 500", "chunk_sise: 500", ["recursive_500_200", "chunk_sise"]),
         ("      chunk_overlap: 200\n", "", ["recursive_500_200", "chunk_overlap"]),
-        ("type: page", "type: page\n    parameters: {chunk_size: 100}", ["page", "parâmetros"]),
-        ("chunk_overlap: 200", "chunk_overlap: 500", ["recursive_500_200", "chunk_overlap", "menor"]),
-        ("type: section", "type: section\n    parameters: {max_chars: 300, overlap: 300}", ["section", "overlap", "menor"]),
+        ("type: page", "type: page\n    parameters: {chunk_size: 100}", ["page", "parameters"]),
+        ("chunk_overlap: 200", "chunk_overlap: 500", ["recursive_500_200", "chunk_overlap", "smaller"]),
+        ("type: section", "type: section\n    parameters: {max_chars: 300, overlap: 300}", ["section", "overlap", "smaller"]),
         ("chunk_size: 500", "chunk_size: 10", ["recursive_500_200", "chunk_size", "50"]),
-        ("name: page", "name: Page Strategy", ["Page Strategy", "minúsculas"]),
+        ("name: page", "name: Page Strategy", ["Page Strategy", "lower-case"]),
     ],
 )
 def test_invalid_strategies(old, new, expected):
@@ -101,15 +101,15 @@ def test_invalid_strategies(old, new, expected):
 @pytest.mark.parametrize(
     "old, new, expected",
     [
-        ("exp_name: page_vector", "exp_name: section_hybrid", ["section_hybrid", "repetido"]),
-        ("collection: page", "collection: nao_existe", ["page_vector", "nao_existe", "section, recursive_500_200, page"]),
-        ("match_count: 2", "match_count: 0", ["page_vector", "match_count", "1 a 20"]),
-        ("match_count: 2", "match_count: 21", ["page_vector", "match_count", "1 a 20"]),
-        ("match_threshold: 0.0", "match_threshold: 1.5", ["section_hybrid", "match_threshold", "0 a 1"]),
+        ("exp_name: page_vector", "exp_name: section_hybrid", ["section_hybrid", "duplicate"]),
+        ("collection: page", "collection: does_not_exist", ["page_vector", "does_not_exist", "section, recursive_500_200, page"]),
+        ("match_count: 2", "match_count: 0", ["page_vector", "match_count", "1 to 20"]),
+        ("match_count: 2", "match_count: 21", ["page_vector", "match_count", "1 to 20"]),
+        ("match_threshold: 0.0", "match_threshold: 1.5", ["section_hybrid", "match_threshold", "0 to 1"]),
         ("search_type: vector", "search_type: semantic", ["page_vector", "semantic", "hybrid, vector, bm25"]),
-        ("assistant: section_hybrid", "assistant: nao_existe", ["assistant", "nao_existe"]),
+        ("assistant: section_hybrid", "assistant: does_not_exist", ["assistant", "does_not_exist"]),
         ("    search_type: vector\n", "", ["page_vector", "search_type"]),
-        ("use_hyde: false", "use_hyde: talvez", ["section_hybrid", "use_hyde"]),
+        ("use_hyde: false", "use_hyde: maybe", ["section_hybrid", "use_hyde"]),
         ("match_count: 2", "match_count: 2\n    top_k: 3", ["page_vector", "top_k"]),
     ],
 )
@@ -137,7 +137,7 @@ def test_all_problems_are_reported_together():
 
 
 def test_malformed_yaml():
-    found = problems(strategies="strategies:\n  - name: [sem fechar")
+    found = problems(strategies="strategies:\n  - name: [not closed")
 
     assert len(found) == 1 and "strategies.yaml" in found[0] and "YAML" in found[0]
 
@@ -148,3 +148,18 @@ def test_empty_file():
 
 def test_no_strategies_declared():
     assert any("strategies" in p for p in problems(strategies="strategies: []"))
+
+
+def test_prompt_defaults_to_the_assistant_rules_and_accepts_the_original():
+    experiments = parse_settings(
+        STRATEGIES, EXPERIMENTS.replace("search_type: vector", "search_type: vector\n    prompt: original")
+    ).experiments
+
+    assert experiments["section_hybrid"].prompt == "rules"
+    assert experiments["page_vector"].prompt == "original"
+
+
+def test_unknown_prompt_is_rejected():
+    found = problems(experiments=EXPERIMENTS.replace("search_type: vector", "search_type: vector\n    prompt: fancy"))
+
+    assert any("page_vector" in p and "fancy" in p and "rules, original" in p for p in found), found

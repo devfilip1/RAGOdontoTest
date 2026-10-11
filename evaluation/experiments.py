@@ -1,6 +1,6 @@
-"""Bancada de experimentos de busca: roda cada experimento sobre o gabarito, sem gerar respostas, e compara.
+"""Bench of search experiments: runs each experiment over the answer key, without generating answers, and compares.
 
-Mede só a busca. A resposta final continua sendo avaliada por `python -m evaluation run`.
+It measures the search only. The final answer is still evaluated by `python -m evaluation run`.
 """
 import csv
 import time
@@ -16,7 +16,7 @@ OK, NOT_RUN, INCOMPLETE = "ok", "not_run", "incomplete"
 
 SUMMARY_COLUMNS = (
     "experiment", "search_type", "collection", "match_threshold", "match_count", "use_hyde", "score", "hits",
-    "total", "true_rate", "anchored_rate", "avg_latency_ms", "status", "reason", "gabarito_version", "embedding_model",
+    "total", "true_rate", "anchored_rate", "avg_latency_ms", "status", "reason", "answer_key_version", "embedding_model",
 )
 QUESTION_COLUMNS = (
     "experiment", "item_id", "question", "hit", "score", "anchored", "retrieved_count", "latency_ms",
@@ -28,14 +28,14 @@ class QuestionResult:
     experiment: str
     item_id: str
     question: str
-    hit: bool            # todas as evidências do item vieram entre os trechos
-    score: float         # média da similarity dos trechos devolvidos; 0 se nenhum
-    anchored: bool       # o trecho com a evidência tem o nome do procedimento
+    hit: bool            # every evidence of the item came among the chunks
+    score: float         # mean similarity of the returned chunks; 0 if none
+    anchored: bool       # the chunk with the evidence has the name of the procedure
     retrieved_count: int
     latency_ms: float
     has_procedure: bool = True
-    sources: dict = field(default_factory=dict)      # métricas por fonte (vector, bm25, fused)
-    retrieved: list = field(default_factory=list)    # primeira linha de cada trecho enviado ao modelo
+    sources: dict = field(default_factory=dict)      # metrics per source (vector, bm25, fused)
+    retrieved: list = field(default_factory=list)    # first line of each chunk sent to the model
 
 
 @dataclass
@@ -71,13 +71,13 @@ class ExperimentResult:
         return sum(question.latency_ms for question in self.questions) / self.total if self.total else None
 
 
-def select_items(gabarito):
-    """Perguntas com resposta do conjunto de trabalho. A parte reservada nunca entra na bancada."""
-    return [item for item in gabarito.items if item.answerable and item.split == "dev"]
+def select_items(answer_key):
+    """Answerable questions of the working set. The reserved part never enters the bench."""
+    return [item for item in answer_key.items if item.answerable and item.split == "dev"]
 
 
 def default_index_check(experiment):
-    """Motivo pelo qual o experimento não pode rodar, ou None."""
+    """Reason why the experiment cannot run, or None."""
     from assistant.index import CURRENT, index_state
     from assistant.settings import get_strategy
 
@@ -91,9 +91,9 @@ def default_retrieve(question, experiment):
     return retrieve(question, RagConfig.from_experiment(experiment))
 
 
-def evaluate_question(experiment, item, retrieval, gabarito, latency_ms):
+def evaluate_question(experiment, item, retrieval, answer_key, latency_ms):
     retrieved = {source: [asdict(chunk) for chunk in getattr(retrieval, source)] for source in SOURCES}
-    sources = score_all_sources(item, retrieved, gabarito)
+    sources = score_all_sources(item, retrieved, answer_key)
     fused = retrieved["fused"]
     similarities = [chunk.get("similarity") or 0.0 for chunk in fused]
     return QuestionResult(
@@ -111,17 +111,17 @@ def evaluate_question(experiment, item, retrieval, gabarito, latency_ms):
     )
 
 
-def run_experiment(experiment, items, gabarito, retrieve_fn=None, index_check=None, on_progress=None, on_question=None):
-    """Roda um experimento. Nunca levanta exceção por causa de um experimento: devolve o estado e o motivo."""
+def run_experiment(experiment, items, answer_key, retrieve_fn=None, index_check=None, on_progress=None, on_question=None):
+    """Runs one experiment. It never raises because of an experiment: it returns the status and the reason."""
     retrieve_fn = retrieve_fn or default_retrieve
     reason = (index_check or default_index_check)(experiment)
     if reason:
         return ExperimentResult(experiment, NOT_RUN, reason)
 
     try:
-        retrieve_fn("Olá", experiment)  # aquecimento: carrega modelos e índice, fora da medição
+        retrieve_fn("Hello", experiment)  # warm-up: loads models and index, outside the measurement
     except Exception as error:
-        return ExperimentResult(experiment, NOT_RUN, f"a busca não pôde ser iniciada ({type(error).__name__}: {error})")
+        return ExperimentResult(experiment, NOT_RUN, f"the search could not be started ({type(error).__name__}: {error})")
 
     result = ExperimentResult(experiment)
     for item in items:
@@ -133,10 +133,10 @@ def run_experiment(experiment, items, gabarito, retrieve_fn=None, index_check=No
             result.status = INCOMPLETE
             detail = f": {error}" if str(error) else ""
             result.reason = (
-                f"interrompido depois de {result.total} de {len(items)} perguntas ({type(error).__name__}{detail})"
+                f"interrupted after {result.total} of {len(items)} questions ({type(error).__name__}{detail})"
             )
             break
-        question = evaluate_question(experiment, item, retrieval, gabarito, latency_ms)
+        question = evaluate_question(experiment, item, retrieval, answer_key, latency_ms)
         result.questions.append(question)
         if on_question:
             on_question(question)
@@ -145,15 +145,15 @@ def run_experiment(experiment, items, gabarito, retrieve_fn=None, index_check=No
     return result
 
 
-def run_all(experiments, items, gabarito, **options):
-    return [run_experiment(experiment, items, gabarito, **options) for experiment in experiments]
+def run_all(experiments, items, answer_key, **options):
+    return [run_experiment(experiment, items, answer_key, **options) for experiment in experiments]
 
 
 def sort_results(results):
-    """Do melhor para o pior: True Rate, depois Score, depois nome. Os não executados ficam no fim.
+    """From best to worst: True Rate, then Score, then name. The ones not run stay at the end.
 
-    No empate de True Rate, os experimentos com HyDE ficam depois dos sem: o Score deles é medido contra a
-    resposta hipotética e sai mais alto, então não serve para desempatar contra um experimento sem HyDE.
+    On a True Rate tie, experiments with HyDE come after the ones without: their Score is measured against the
+    hypothetical answer and comes out higher, so it cannot break a tie against an experiment without HyDE.
     """
     done = [result for result in results if result.status == OK]
     others = [result for result in results if result.status != OK]
@@ -163,12 +163,12 @@ def sort_results(results):
 
 
 def format_question_line(question):
-    """Linha de detalhe: pergunta;acertou;nota."""
+    """Detail line: question;hit;score."""
     return f"{question.question};{'true' if question.hit else 'false'};{question.score:.2f}"
 
 
 def source_summary(result):
-    """Médias por fonte de busca (vetorial, por palavras e combinada), para o comando retrieval."""
+    """Means per search source (vector, word-based, and combined), for the retrieval command."""
     summary = {}
     for source in SOURCES:
         scores = [question.sources[source] for question in result.questions]
@@ -180,7 +180,7 @@ def source_summary(result):
 
 
 def misses(result):
-    """Perguntas em que alguma evidência não chegou ao modelo."""
+    """Questions in which some evidence did not reach the model."""
     return [
         {"item_id": question.item_id, "question": question.question, "retrieved": question.retrieved}
         for question in result.questions if not question.hit
@@ -195,7 +195,7 @@ def _boolean(value):
     return "true" if value else "false"
 
 
-def summary_row(result, gabarito_version, embedding_model):
+def summary_row(result, answer_key_version, embedding_model):
     experiment = result.experiment
     done = result.status == OK
     return {
@@ -213,32 +213,32 @@ def summary_row(result, gabarito_version, embedding_model):
         "avg_latency_ms": _number(result.avg_latency_ms, 1) if done else "",
         "status": result.status,
         "reason": result.reason,
-        "gabarito_version": gabarito_version,
+        "answer_key_version": answer_key_version,
         "embedding_model": embedding_model,
     }
 
 
-def write_csv(results, started_at, gabarito_version, embedding_model, directory=RESULTS_DIR):
-    """Grava o resumo e o detalhe por pergunta. Devolve os dois caminhos."""
+def write_csv(results, started_at, answer_key_version, embedding_model, directory=RESULTS_DIR):
+    """Writes the summary and the per-question detail. Returns the two paths."""
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     stamp = started_at.strftime("%Y%m%d-%H%M%S")
     attempt = 1
-    while (directory / f"{stamp}-summary.csv").exists():  # duas execuções no mesmo segundo não se sobrescrevem
+    while (directory / f"{stamp}-summary.csv").exists():  # two runs in the same second do not overwrite each other
         attempt += 1
         stamp = f"{started_at.strftime('%Y%m%d-%H%M%S')}-{attempt}"
     summary_path = directory / f"{stamp}-summary.csv"
     questions_path = directory / f"{stamp}-questions.csv"
 
-    # UTF-8 com BOM e ";" para abrir direto no Excel em português
+    # UTF-8 with BOM so Excel opens it directly with the right encoding
     with open(summary_path, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=SUMMARY_COLUMNS, delimiter=";")
+        writer = csv.DictWriter(f, fieldnames=SUMMARY_COLUMNS, delimiter=",")
         writer.writeheader()
         for result in results:
-            writer.writerow(summary_row(result, gabarito_version, embedding_model))
+            writer.writerow(summary_row(result, answer_key_version, embedding_model))
 
     with open(questions_path, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=QUESTION_COLUMNS, delimiter=";")
+        writer = csv.DictWriter(f, fieldnames=QUESTION_COLUMNS, delimiter=",")
         writer.writeheader()
         for result in results:
             for question in result.questions:

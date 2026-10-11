@@ -1,4 +1,4 @@
-"""Verificações da base de conhecimento, sem modelo de linguagem (research D15)."""
+"""Checks of the knowledge base, with no language model."""
 import json
 import unicodedata
 from collections import Counter
@@ -6,13 +6,13 @@ from collections import Counter
 from evaluation.normalize import normalize_text
 from evaluation.retrieval_metrics import contains
 
-# Caracteres que indicam falha na extração do texto do PDF.
+# Characters that show a failure in extracting the PDF text.
 CORRUPTED_CHARS = {"■", "□", "�"}
 ALLOWED_CONTROL = {"\n", "\r", "\t"}
 
 
 def load_kb(strategy_name):
-    """Devolve (trechos da base vetorial, trechos do arquivo usado pela busca lexical) de uma estratégia."""
+    """Returns (chunks of the vector base, chunks of the file used by the word-based search) of a strategy."""
     from langchain_chroma.vectorstores import Chroma
 
     from assistant.config import COLLECTION_NAME
@@ -28,7 +28,7 @@ def load_kb(strategy_name):
 
 
 def find_duplicates(chunks):
-    """Trechos armazenados mais de uma vez, com a quantidade de repetições."""
+    """Chunks stored more than once, with the number of repetitions."""
     counts = Counter(normalize_text(chunk) for chunk in chunks)
     first = {}
     for chunk in chunks:
@@ -36,16 +36,16 @@ def find_duplicates(chunks):
     return [{"content": first[key], "count": count} for key, count in counts.items() if count > 1]
 
 
-def find_unanchored_facts(gabarito, chunks):
-    """Evidências do gabarito que não têm nenhum trecho com o nome do procedimento junto (FR-028).
+def find_unanchored_facts(answer_key, chunks):
+    """Evidence quotes of the answer key that have no chunk with the name of the procedure next to them.
 
-    kind "missing": nenhum trecho contém a evidência inteira (ex.: a divisão cortou a linha).
-    kind "unanchored": há trechos com a evidência, mas nenhum deles tem o nome do procedimento.
+    kind "missing": no chunk contains the whole evidence (for example, the chunking cut the line).
+    kind "unanchored": there are chunks with the evidence, but none of them has the name of the procedure.
     """
     problems = []
     seen = set()
-    for item in gabarito.items:
-        anchors = gabarito.anchors(item.procedure)
+    for item in answer_key.items:
+        anchors = answer_key.anchors(item.procedure)
         for evidence in item.evidence:
             if (item.procedure, evidence) in seen:
                 continue
@@ -62,7 +62,7 @@ def find_unanchored_facts(gabarito, chunks):
 
 
 def find_corrupted(chunks):
-    """Trechos com caracteres corrompidos na extração."""
+    """Chunks with characters corrupted in the extraction."""
     problems = []
     for chunk in chunks:
         bad = sorted({
@@ -75,7 +75,7 @@ def find_corrupted(chunks):
 
 
 def find_source_mismatch(vector_chunks, file_chunks):
-    """Diferenças entre a base vetorial e o arquivo de trechos, que deveriam ter o mesmo conteúdo."""
+    """Differences between the vector base and the chunk file, which should have the same content."""
     vector = Counter(normalize_text(chunk) for chunk in vector_chunks)
     lexical = Counter(normalize_text(chunk) for chunk in file_chunks)
     return {
@@ -87,11 +87,11 @@ def find_source_mismatch(vector_chunks, file_chunks):
     }
 
 
-def run_checks(gabarito, vector_chunks, file_chunks):
+def run_checks(answer_key, vector_chunks, file_chunks):
     return {
         "chunk_count": len(vector_chunks),
         "duplicates": find_duplicates(vector_chunks),
-        "unanchored": find_unanchored_facts(gabarito, vector_chunks),
+        "unanchored": find_unanchored_facts(answer_key, vector_chunks),
         "corrupted": find_corrupted(vector_chunks),
         "source_mismatch": find_source_mismatch(vector_chunks, file_chunks),
     }

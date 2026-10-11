@@ -1,4 +1,4 @@
-"""Métricas agregadas de uma execução e variação entre repetições."""
+"""Aggregated metrics of a run and variation across repetitions."""
 import math
 
 from evaluation.diagnose import CAUSES
@@ -13,7 +13,7 @@ def _mean(values):
 
 
 def _percentile(values, fraction):
-    """Percentil pelo método do posto mais próximo."""
+    """Percentile by the nearest-rank method."""
     if not values:
         return None
     ordered = sorted(values)
@@ -21,7 +21,7 @@ def _percentile(values, fraction):
 
 
 def aggregate(results, items_by_id, human_agreement=None):
-    """results: lista de "Resultado por pergunta". Métrica sem itens na base vale None."""
+    """results: list of per-question results. A metric with no items to compute from is None."""
     pairs = [(items_by_id[result["item_id"]], result) for result in results]
     answerable = [(item, result) for item, result in pairs if item.answerable]
     unanswerable = [(item, result) for item, result in pairs if not item.answerable]
@@ -93,7 +93,7 @@ def aggregate(results, items_by_id, human_agreement=None):
 
 
 def flatten(metrics):
-    """Métricas comparáveis entre execuções, como {"retrieval.fused.hit_rate": 0.8, ...}."""
+    """Metrics comparable between runs, as {"retrieval.fused.hit_rate": 0.8, ...}."""
     flat = {"overall.pass_rate": metrics["overall"]["pass_rate"]}
     for source in SOURCES:
         for name in RETRIEVAL_METRICS:
@@ -108,7 +108,7 @@ def flatten(metrics):
 
 
 def variance(metric_sets):
-    """Média, mínimo e máximo de cada métrica entre repetições (lista de métricas agregadas)."""
+    """Mean, minimum, and maximum of each metric across repetitions (list of aggregated metrics)."""
     flats = [flatten(metrics) for metrics in metric_sets]
     summary = {}
     for name in flats[0]:

@@ -1,4 +1,4 @@
-"""Métricas de busca: a evidência do gabarito foi recuperada? Em que posição? Com o procedimento junto?"""
+"""Search metrics: was the evidence of the answer key retrieved? At which position? With the procedure next to it?"""
 from evaluation.normalize import normalize_text
 
 SOURCES = ("vector", "bm25", "fused")
@@ -9,7 +9,7 @@ def contains(chunk, snippet):
 
 
 def score_retrieval(item, chunks, anchors):
-    """chunks: textos na ordem em que foram recuperados. Devolve None para pergunta sem resposta."""
+    """chunks: texts in the order they were retrieved. Returns None for an unanswerable question."""
     if not item.answerable:
         return None
 
@@ -34,11 +34,11 @@ def score_retrieval(item, chunks, anchors):
     }
 
 
-def score_all_sources(item, retrieved, gabarito):
-    """retrieved: {"vector": [...], "bm25": [...], "fused": [...]}, cada trecho com "content"."""
+def score_all_sources(item, retrieved, answer_key):
+    """retrieved: {"vector": [...], "bm25": [...], "fused": [...]}, each chunk with "content"."""
     if not item.answerable:
         return None
-    anchors = gabarito.anchors(item.procedure)
+    anchors = answer_key.anchors(item.procedure)
     return {
         source: score_retrieval(item, [chunk["content"] for chunk in retrieved[source]], anchors)
         for source in SOURCES

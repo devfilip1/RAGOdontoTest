@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Estratégias de divisão do material (config/strategies.yaml)",
+  "title": "Chunking strategies of the brochure (config/strategies.yaml)",
   "type": "object",
   "required": ["strategies"],
   "additionalProperties": false,

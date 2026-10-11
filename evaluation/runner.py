@@ -1,4 +1,4 @@
-"""Execução da avaliação: consulta o assistente item a item e monta o resultado de cada pergunta."""
+"""Running the evaluation: asks the assistant item by item and builds the result of each question."""
 from dataclasses import asdict, replace
 
 from evaluation.answer_metrics import (
@@ -12,18 +12,18 @@ from evaluation.diagnose import classify
 from evaluation.normalize import extract_values
 from evaluation.retrieval_metrics import SOURCES, score_all_sources
 
-# Parâmetros de geração da avaliação, para a mesma pergunta dar a mesma resposta (research D10).
+# Generation parameters of the evaluation, so the same question gets the same answer.
 EVAL_TEMPERATURE = 0
 EVAL_SEED = 42
 
 
 class FactIndex:
-    """Fatos do gabarito agrupados, para saber o que uma resposta pode citar sem ser erro."""
+    """Facts of the answer key grouped, to know what an answer may mention without it being an error."""
 
-    def __init__(self, gabarito):
+    def __init__(self, answer_key):
         self.by_procedure = {}
-        self.general = []  # diferenciais da clínica valem para qualquer pergunta
-        for item in gabarito.items:
+        self.general = []  # what sets the clinic apart is valid for any question
+        for item in answer_key.items:
             facts = [*item.expected_facts, *item.allowed_facts]
             if item.procedure:
                 self.by_procedure.setdefault(item.procedure, []).extend(facts)
@@ -45,8 +45,8 @@ def eval_config(config):
     return replace(config, temperature=EVAL_TEMPERATURE, seed=EVAL_SEED)
 
 
-def evaluate_item(item, answer_result, gabarito, index, judge_fn=None):
-    """Monta o "Resultado por pergunta" do data-model a partir da resposta do assistente."""
+def evaluate_item(item, answer_result, answer_key, index, judge_fn=None):
+    """Builds the per-question result of the run record from the assistant's answer."""
     answer = answer_result.answer
     retrieved = {
         source: [asdict(chunk) for chunk in getattr(answer_result.retrieval, source)] for source in SOURCES
@@ -56,7 +56,7 @@ def evaluate_item(item, answer_result, gabarito, index, judge_fn=None):
     facts = check_facts(answer, item.expected_facts)
     if item.answerable:
         known = index.known_for(item)
-        # com procedimento, todos os valores são conferidos; sem ele, só os tipos que a pergunta pede
+        # with a procedure, every value is checked; without one, only the kinds the question asks for
         kinds = None if item.procedure else {fact.type for fact in item.expected_facts if fact.type != "text"}
         unexpected = unexpected_values(answer, known, kinds)
     else:
@@ -81,7 +81,7 @@ def evaluate_item(item, answer_result, gabarito, index, judge_fn=None):
         "item_id": item.id,
         "answer": answer,
         "retrieved": retrieved,
-        "retrieval": score_all_sources(item, retrieved, gabarito),
+        "retrieval": score_all_sources(item, retrieved, answer_key),
         "facts": facts,
         "unexpected_values": unexpected,
         "ungrounded_values": ungrounded_values(answer, fused_texts),
@@ -99,16 +99,16 @@ def evaluate_item(item, answer_result, gabarito, index, judge_fn=None):
     return result
 
 
-def run_evaluation(items, gabarito, config, judge_fn=None, repeat=1, on_progress=None, answer_fn=None):
-    """Roda o conjunto `repeat` vezes. O juiz só avalia a primeira repetição.
+def run_evaluation(items, answer_key, config, judge_fn=None, repeat=1, on_progress=None, answer_fn=None):
+    """Runs the set `repeat` times. The judge only evaluates the first repetition.
 
-    Devolve status ("complete" ou "incomplete"), repetitions (uma lista de resultados por repetição),
-    skipped (ids não avaliados) e error (mensagem, quando incompleta).
+    Returns status ("complete" or "incomplete"), repetitions (one list of results per repetition),
+    skipped (ids not evaluated), and error (message, when incomplete).
     """
     if answer_fn is None:
         from assistant.pipeline import answer as answer_fn
 
-    index = FactIndex(gabarito)
+    index = FactIndex(answer_key)
     repetitions = []
     try:
         for repetition in range(repeat):
@@ -117,7 +117,7 @@ def run_evaluation(items, gabarito, config, judge_fn=None, repeat=1, on_progress
             for item in items:
                 answer_result = answer_fn(item.question, config)
                 judge = judge_fn if repetition == 0 else None
-                results.append(evaluate_item(item, answer_result, gabarito, index, judge))
+                results.append(evaluate_item(item, answer_result, answer_key, index, judge))
                 if on_progress:
                     on_progress()
     except (Exception, KeyboardInterrupt) as error:
@@ -132,23 +132,23 @@ def run_evaluation(items, gabarito, config, judge_fn=None, repeat=1, on_progress
 
 
 def warm_up(config, answer_fn=None):
-    """Carrega os modelos antes de medir, para a primeira pergunta não entrar com o tempo de carga."""
+    """Loads the models before measuring, so the first question does not carry the load time."""
     if answer_fn is None:
         from assistant.pipeline import answer as answer_fn
-    answer_fn("Olá", config)
+    answer_fn("Hello", config)
 
 
 def preflight(models, host):
-    """Confere se o Ollama responde e se os modelos estão instalados. Devolve a lista de problemas."""
+    """Checks whether Ollama answers and whether the models are installed. Returns the list of problems."""
     import ollama
 
     try:
         installed = {model.model for model in ollama.Client(host=host).list().models}
     except Exception as error:
-        return [f"o Ollama não respondeu em {host} ({type(error).__name__}). Ele está em execução?"]
+        return [f"Ollama did not answer at {host} ({type(error).__name__}). Is it running?"]
 
     installed |= {name.removesuffix(":latest") for name in installed}
     return [
-        f"modelo \"{model}\" não está instalado (rode: ollama pull {model})"
+        f"model \"{model}\" is not installed (run: ollama pull {model})"
         for model in dict.fromkeys(models) if model not in installed
     ]

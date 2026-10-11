@@ -1,16 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Resultado de uma avaliação (run.json)",
+  "title": "Result of one evaluation (run.json)",
   "type": "object",
-  "required": ["run_id", "started_at", "finished_at", "status", "subset", "gabarito_version", "gabarito_hash", "config", "repeat", "results", "metrics", "skipped"],
+  "required": ["run_id", "started_at", "finished_at", "status", "subset", "answer_key_version", "answer_key_hash", "config", "repeat", "results", "metrics", "skipped"],
   "properties": {
     "run_id": { "type": "string", "pattern": "^[0-9]{8}-[0-9]{6}(-[a-z0-9-]+)?$" },
     "started_at": { "type": "string", "format": "date-time" },
     "finished_at": { "type": "string", "format": "date-time" },
     "status": { "enum": ["complete", "incomplete"] },
     "subset": { "enum": ["dev", "holdout", "smoke"] },
-    "gabarito_version": { "type": "string" },
-    "gabarito_hash": { "type": "string" },
+    "answer_key_version": { "type": "string" },
+    "answer_key_hash": { "type": "string" },
     "repeat": { "type": "integer", "minimum": 1 },
     "skipped": { "type": "array", "items": { "type": "string" } },
     "config": {
@@ -23,6 +23,7 @@
         "match_count": { "type": ["integer", "null"] },
         "match_threshold": { "type": ["number", "null"] },
         "use_hyde": { "type": ["boolean", "null"] },
+        "prompt": { "type": ["string", "null"] },
         "chunk_size": { "type": ["integer", "null"] },
         "chunk_overlap": { "type": ["integer", "null"] },
         "vector_k": { "type": "integer" },

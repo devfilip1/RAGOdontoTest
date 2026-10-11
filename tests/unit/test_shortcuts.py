@@ -1,4 +1,4 @@
-﻿"""O Makefile e o run.ps1 precisam oferecer os mesmos atalhos, apontando para os mesmos comandos."""
+﻿"""The Makefile and run.ps1 must offer the same shortcuts, pointing to the same commands."""
 import re
 from pathlib import Path
 
@@ -11,7 +11,7 @@ EXPECTED = [
 
 
 def powershell_shortcuts():
-    text = (ROOT / "run.ps1").read_text(encoding="utf-8-sig")  # com BOM, exigido pelo PowerShell 5 para os acentos
+    text = (ROOT / "run.ps1").read_text(encoding="utf-8-sig")  # with BOM, which PowerShell 5 needs to read UTF-8
     entries = re.findall(r'^\s*"([a-z-]+)"\s*=\s*@\("([^"]*)",\s*"([^"]+)"\)', text, re.M)
     return {name: (command, description) for name, command, description in entries}
 
@@ -35,7 +35,7 @@ def test_each_shortcut_runs_the_same_command_in_both_files():
 
     for name in EXPECTED:
         if name == "help":
-            continue  # cada arquivo lista os atalhos à sua maneira
+            continue  # each file lists the shortcuts in its own way
         assert powershell[name][0] == make[name][0], name
         assert powershell[name][0].startswith("-m "), name
 

@@ -1,30 +1,39 @@
-"""Métricas determinísticas da resposta: fatos, fidelidade numérica, recusa e regras de atendimento."""
+"""Deterministic metrics of the answer: facts, numeric faithfulness, refusal, and service rules."""
 import re
 
 from evaluation.normalize import canonical_text, extract_values, normalize_text
 
-# Trechos (já normalizados) que indicam que o assistente declarou não ter a informação.
-# A primeira entrada é a frase mandada pelo prompt; ajustar aqui quando o prompt mudar.
+# Pieces (already normalized) that show the assistant said it does not have the information.
+# The first entry is the sentence ordered by the prompt; adjust here when the prompt changes.
 ABSTENTION_PATTERNS = (
-    "nao encontrei",
-    "nao encontramos",
-    "nao tenho essa informacao",
-    "nao tenho informac",
-    "nao possuo",
-    "nao disponho",
-    "nao ha informac",
-    "nao consta",
-    "nao e mencionad",
-    "nao foi mencionad",
-    "nao sei informar",
-    "nao posso",
-    "nao consigo",
+    "i don't have that information",
+    "i do not have that information",
+    "don't have information",
+    "do not have information",
+    "don't have any information",
+    "do not have any information",
+    "no information",
+    "not mentioned",
+    "isn't mentioned",
+    "couldn't find",
+    "could not find",
+    "i'm not able",
+    "i am not able",
+    "i'm unable",
+    "i am unable",
+    "i can't",
+    "i cannot",
+    "i'm not sure",
+    "i am not sure",
 )
 
 FORBIDDEN_TERMS = {
-    "contexto": r"\bcontextos?\b",
-    "documento": r"\bdocumentos?\b",
-    "base de dados": r"\bbases? de dados\b",
+    "according to": r"\baccording to\b",
+    "context": r"\bcontexts?\b",
+    "document": r"\bdocuments?\b",
+    "brochure": r"\bbrochures?\b",
+    "database": r"\bdata ?bases?\b",
+    "provided information": r"\b(?:provided information|information provided|clinic information)\b",
 }
 MAX_ANSWER_CHARS = 1200
 
@@ -33,7 +42,7 @@ _EN_WORDS = {"the", "is", "and", "of", "to", "you", "for", "with", "our", "your"
 
 
 def check_facts(answer, expected_facts):
-    """Para cada fato esperado, diz se a resposta o contém."""
+    """For each expected fact, says whether the answer contains it."""
     values = {v.key for v in extract_values(answer)}
     text = canonical_text(answer)
     found = []
@@ -47,9 +56,9 @@ def check_facts(answer, expected_facts):
 
 
 def unexpected_values(answer, known_facts, kinds=None):
-    """Valores de dinheiro ou duração da resposta que não pertencem aos fatos conhecidos.
+    """Money, duration, or clock time values of the answer that do not belong to the known facts.
 
-    kinds limita a conferência a alguns tipos ("money", "duration"); None confere todos.
+    kinds limits the check to some kinds ("money", "duration", "time"); None checks all of them.
     """
     known = {target for fact in known_facts for target in fact.targets()}
     labels = []
@@ -62,7 +71,7 @@ def unexpected_values(answer, known_facts, kinds=None):
 
 
 def ungrounded_values(answer, chunks):
-    """Valores da resposta que não aparecem em nenhum trecho recuperado."""
+    """Values of the answer that do not appear in any retrieved chunk."""
     grounded = {v.key for chunk in chunks for v in extract_values(chunk)}
     labels = []
     for value in extract_values(answer):
@@ -72,7 +81,7 @@ def ungrounded_values(answer, chunks):
 
 
 def factual_ok(answer, expected_facts, allowed_facts=()):
-    """Todos os fatos esperados presentes e nenhum valor estranho dos mesmos tipos."""
+    """Every expected fact present and no stray value of the same kinds."""
     kinds = {fact.type for fact in expected_facts if fact.type != "text"}
     return all(f["found"] for f in check_facts(answer, expected_facts)) and not unexpected_values(
         answer, [*expected_facts, *allowed_facts], kinds
@@ -85,7 +94,7 @@ def detect_abstention(answer):
 
 
 def check_rules(answer):
-    """Regras de atendimento com resposta objetiva. Devolve as violações."""
+    """Service rules with an objective answer. Returns the violations."""
     text = normalize_text(answer)
     violations = []
     for term, pattern in FORBIDDEN_TERMS.items():
@@ -94,6 +103,6 @@ def check_rules(answer):
     if len(answer) > MAX_ANSWER_CHARS:
         violations.append("too_long")
     words = re.findall(r"[a-z]+", text)
-    if sum(w in _EN_WORDS for w in words) > sum(w in _PT_WORDS for w in words):
-        violations.append("not_portuguese")
+    if sum(w in _PT_WORDS for w in words) > sum(w in _EN_WORDS for w in words):
+        violations.append("not_english")
     return violations

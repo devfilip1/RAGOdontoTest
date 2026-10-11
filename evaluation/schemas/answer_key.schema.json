@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Gabarito de avaliação do assistente OdontoTest",
+  "title": "Answer key for evaluating the DentalSafe assistant (evaluation/data/answer_key.json)",
   "type": "object",
   "required": ["version", "procedures", "items"],
   "additionalProperties": false,
@@ -28,7 +28,7 @@
         "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
         "question": { "type": "string", "minLength": 1 },
         "category": {
-          "enum": ["price", "duration", "result", "indication", "how_it_works", "differentials", "comparison", "out_of_scope", "adversarial"]
+          "enum": ["price", "duration", "result", "indication", "how_it_works", "differentials", "comparison", "clinic_info", "out_of_scope", "adversarial"]
         },
         "procedure": { "type": ["string", "null"] },
         "answerable": { "type": "boolean" },
@@ -60,7 +60,7 @@
       "required": ["type", "label"],
       "additionalProperties": false,
       "properties": {
-        "type": { "enum": ["money", "duration", "text"] },
+        "type": { "enum": ["money", "duration", "time", "text"] },
         "label": { "type": "string", "minLength": 1 },
         "values": { "type": "array", "minItems": 1, "items": { "type": "number" } },
         "unit": { "enum": ["minute", "hour", "day", "month", "year", "session", "visit"] },
@@ -69,6 +69,7 @@
       "allOf": [
         { "if": { "properties": { "type": { "const": "money" } } }, "then": { "required": ["values"] } },
         { "if": { "properties": { "type": { "const": "duration" } } }, "then": { "required": ["values", "unit"] } },
+        { "if": { "properties": { "type": { "const": "time" } } }, "then": { "required": ["values"], "properties": { "values": { "items": { "minimum": 0, "maximum": 1439 } } } } },
         { "if": { "properties": { "type": { "const": "text" } } }, "then": { "required": ["alternatives"] } }
       ]
     }

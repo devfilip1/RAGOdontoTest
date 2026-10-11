@@ -10,19 +10,19 @@ def to_ask():
         config = RagConfig()
         require_index(get_strategy(config.strategy))
     except SettingsError as error:
-        print(f"Configuração inválida: {len(error.problems)} problema(s)")
+        print(f"Invalid configuration: {len(error.problems)} problem(s)")
         for problem in error.problems:
             print(f"  - {problem}")
         return 2
     except IndexUnavailable as error:
-        print(f"Não foi possível iniciar: {error}")
+        print(f"Could not start: {error}")
         return 1
 
     while True:
-        ask = input("Digite sua pergunta: ")
+        ask = input("Type your question: ")
 
-        if ask.lower() in ["sair", "exit", "quit"]:
-            print("Encerrando o assistente. Até mais!")
+        if ask.lower() in ["exit", "quit"]:
+            print("Closing the assistant. See you!")
             break
 
         if not ask.strip():

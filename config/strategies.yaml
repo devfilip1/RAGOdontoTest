@@ -1,20 +1,20 @@
-# Estratégias de divisão do material da clínica.
-# Cada estratégia gera o seu próprio índice em data/index/<name>/.
-# Depois de editar este arquivo, recrie os índices: python -m assistant.ingest
+# Chunking strategies of the clinic brochure.
+# Each strategy builds its own index in data/index/<name>/.
+# After editing this file, rebuild the indexes: python -m assistant.ingest
 #
-# Tipos disponíveis:
-#   section  um trecho por seção do documento (um tratamento por trecho)
-#            parameters opcionais: max_chars (padrão 1200), overlap (padrão 100)
-#   split    divisão por caracteres
-#            parameters obrigatórios: chunk_size, chunk_overlap
-#   page     um trecho por página, sem parâmetros
+# Available types:
+#   section  one chunk per section of the document (one treatment per chunk)
+#            optional parameters: max_chars (default 1200), overlap (default 100)
+#   split    splitting by characters
+#            required parameters: chunk_size, chunk_overlap
+#   page     one chunk per page, no parameters
 
 strategies:
-  # A divisão em uso no assistente: cada valor fica junto do nome do tratamento.
+  # The chunking the assistant uses: each value stays next to the name of its treatment.
   - name: section
     type: section
 
-  # A divisão original do projeto.
+  # The project's original chunking.
   - name: recursive_500_200
     type: split
     parameters:

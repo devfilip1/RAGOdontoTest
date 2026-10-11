@@ -1,6 +1,6 @@
-# Atalhos para os comandos do projeto. Uso: make <atalho> [ARGS="argumentos"]
-# Os mesmos nomes existem em run.ps1, que funciona no Windows sem instalar o make.
-# Um teste confere que os dois arquivos não divergem.
+# Shortcuts for the project commands. Usage: make <shortcut> [ARGS="arguments"]
+# The same names exist in run.ps1, which works on Windows without installing make.
+# A test checks that the two files do not drift apart.
 
 ifeq ($(OS),Windows_NT)
 PYTHON ?= .venv/Scripts/python.exe
@@ -13,47 +13,47 @@ ARGS ?=
 .DEFAULT_GOAL := help
 .PHONY: help install ingest chat test test-integration eval eval-smoke eval-full experiments retrieval kb-check validate compare baseline
 
-help: ## Lista os atalhos
+help: ## List the shortcuts
 	@$(PYTHON) -c "import re; [print(f'  {m[1]:<18} {m[2]}') for m in re.finditer(r'^([a-z-]+):.*?## (.+)$$', open('Makefile', encoding='utf-8').read(), re.M)]"
 
-install: ## Instala as dependências
+install: ## Install the dependencies
 	$(PYTHON) -m pip install -r requirements.txt $(ARGS)
 
-ingest: ## Cria os índices de todas as estratégias
+ingest: ## Build the indexes of every strategy
 	$(PYTHON) -m assistant.ingest $(ARGS)
 
-chat: ## Conversa com o assistente
+chat: ## Chat with the assistant
 	$(PYTHON) -m assistant.chat $(ARGS)
 
-test: ## Testes de unidade (sem Ollama)
+test: ## Unit tests (no Ollama needed)
 	$(PYTHON) -m pytest $(ARGS)
 
-test-integration: ## Testes com o Ollama e o índice
+test-integration: ## Tests with Ollama and the index
 	$(PYTHON) -m pytest -m integration $(ARGS)
 
-eval: ## Avaliação da resposta, sem o juiz
+eval: ## Answer evaluation, without the judge
 	$(PYTHON) -m evaluation run --no-judge $(ARGS)
 
-eval-smoke: ## Avaliação rápida, 10 perguntas
+eval-smoke: ## Quick evaluation, 10 questions
 	$(PYTHON) -m evaluation run --smoke --no-judge $(ARGS)
 
-eval-full: ## Avaliação da resposta, com o juiz
+eval-full: ## Answer evaluation, with the judge
 	$(PYTHON) -m evaluation run $(ARGS)
 
-experiments: ## Compara os experimentos de busca
+experiments: ## Compare the search experiments
 	$(PYTHON) -m evaluation experiments $(ARGS)
 
-retrieval: ## Detalhe da busca do experimento do assistente
+retrieval: ## Search detail of the assistant's experiment
 	$(PYTHON) -m evaluation retrieval $(ARGS)
 
-kb-check: ## Verifica a base de conhecimento
+kb-check: ## Check the knowledge base
 	$(PYTHON) -m evaluation kb-check $(ARGS)
 
-validate: ## Valida a configuração e o gabarito
+validate: ## Validate the configuration and the answer key
 	$(PYTHON) -m evaluation validate $(ARGS)
 
-compare: ## Compara a última avaliação com a referência
+compare: ## Compare the latest evaluation with the reference
 	$(PYTHON) -m evaluation compare $(ARGS)
 
-baseline: ## Marca a última avaliação como referência
+baseline: ## Set the latest evaluation as the reference
 	$(PYTHON) -m evaluation baseline set $(ARGS)

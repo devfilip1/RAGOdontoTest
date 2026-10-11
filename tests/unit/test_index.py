@@ -64,9 +64,9 @@ def test_current_index(tmp_path):
 @pytest.mark.parametrize(
     "change, expected",
     [
-        ({"strategy": Strategy("section", "section", {"max_chars": 800, "overlap": 100})}, "definição da estratégia"),
-        ({"source": "pdf-2"}, "material da clínica"),
-        ({"model": "bge-m3"}, "modelo de embedding"),
+        ({"strategy": Strategy("section", "section", {"max_chars": 800, "overlap": 100})}, "strategy definition"),
+        ({"source": "pdf-2"}, "brochure changed"),
+        ({"model": "bge-m3"}, "embedding model"),
     ],
 )
 def test_stale_index(tmp_path, change, expected):
@@ -93,7 +93,7 @@ def test_writing_one_index_does_not_touch_another(tmp_path):
 def test_require_index_raises_with_the_reason(tmp_path, monkeypatch):
     monkeypatch.setattr(index, "source_hash", lambda path=None: "pdf-1")
 
-    with pytest.raises(index.IndexUnavailable, match="ainda não foi criado"):
+    with pytest.raises(index.IndexUnavailable, match="has not been built yet"):
         index.require_index(SECTION, base=tmp_path)
 
     index.write_manifest(SECTION, 11, base=tmp_path)

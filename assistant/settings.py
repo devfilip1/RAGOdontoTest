@@ -1,4 +1,4 @@
-"""Estratégias de divisão e experimentos de busca, lidos de config/strategies.yaml e config/experiments.yaml."""
+"""Chunking strategies and search experiments, read from config/strategies.yaml and config/experiments.yaml."""
 import hashlib
 import json
 from dataclasses import dataclass, field
@@ -11,13 +11,14 @@ from assistant.config import EXPERIMENTS_PATH, SCHEMAS_DIR, STRATEGIES_PATH
 
 STRATEGY_TYPES = ("section", "split", "page")
 SEARCH_TYPES = ("hybrid", "vector", "bm25")
+PROMPTS = ("rules", "original")
 TYPE_DEFAULTS = {"section": {"max_chars": 1200, "overlap": 100}, "split": {}, "page": {}}
-# par (tamanho, sobreposição) de cada tipo: a sobreposição precisa ser menor que o tamanho
+# (size, overlap) pair of each type: the overlap must be smaller than the size
 SIZE_AND_OVERLAP = {"section": ("max_chars", "overlap"), "split": ("chunk_size", "chunk_overlap")}
 
 
 class SettingsError(Exception):
-    """Configuração inválida. problems traz uma mensagem por problema, dizendo o que corrigir."""
+    """Invalid configuration. problems has one message per problem, saying what to fix."""
 
     def __init__(self, problems):
         super().__init__("\n".join(problems))
@@ -31,7 +32,7 @@ class Strategy:
     parameters: dict = field(default_factory=dict, hash=False)
 
     def definition_hash(self):
-        """Muda quando o tipo ou os parâmetros mudam: é o que diz se um índice está desatualizado."""
+        """Changes when the type or the parameters change: it is what tells whether an index is out of date."""
         definition = json.dumps({"type": self.type, "parameters": self.parameters}, sort_keys=True)
         return hashlib.sha256(definition.encode("utf-8")).hexdigest()[:16]
 
@@ -44,12 +45,13 @@ class Experiment:
     match_count: int
     match_threshold: float = 0.0
     use_hyde: bool = False
+    prompt: str = "rules"
 
 
 @dataclass(frozen=True)
 class Settings:
-    strategies: dict  # nome -> Strategy, na ordem do arquivo
-    experiments: dict  # nome -> Experiment, na ordem do arquivo
+    strategies: dict  # name -> Strategy, in file order
+    experiments: dict  # name -> Experiment, in file order
     assistant: Experiment
 
 
@@ -61,16 +63,16 @@ def _load_yaml(text, file_name, problems):
     try:
         data = yaml.safe_load(text)
     except yaml.YAMLError as error:
-        problems.append(f"{file_name}: YAML inválido: {' '.join(str(error).split())}")
+        problems.append(f"{file_name}: invalid YAML: {' '.join(str(error).split())}")
         return None
     if not isinstance(data, dict):
-        problems.append(f"{file_name}: o arquivo está vazio ou não tem a estrutura esperada")
+        problems.append(f"{file_name}: the file is empty or does not have the expected structure")
         return None
     return data
 
 
 def _item_label(data, error, list_key, name_key):
-    """Nome do item em que o erro aconteceu, para a mensagem apontar o lugar certo."""
+    """Name of the item where the error happened, so the message points to the right place."""
     path = list(error.absolute_path)
     if len(path) >= 2 and path[0] == list_key and isinstance(path[1], int):
         item = data[list_key][path[1]]
@@ -81,7 +83,7 @@ def _item_label(data, error, list_key, name_key):
 
 
 def _describe(error, label, where):
-    """Traduz um erro do esquema em uma instrução do que corrigir."""
+    """Turns a schema error into an instruction of what to fix."""
     target = f"{label}: " if label else ""
     name = where[-1] if where else None
     validator = error.validator
@@ -89,34 +91,34 @@ def _describe(error, label, where):
     if validator == "required":
         missing = [key for key in error.validator_value if key not in error.instance]
         if where and where[-1] == "parameters":
-            return f"{target}faltam os parâmetros obrigatórios: {', '.join(missing)}"
-        return f"{target}falta o campo obrigatório: {', '.join(missing)}"
+            return f"{target}missing required parameters: {', '.join(missing)}"
+        return f"{target}missing required field: {', '.join(missing)}"
     if validator == "additionalProperties":
         allowed = set(error.schema.get("properties", {}))
         unknown = [key for key in error.instance if key not in allowed]
-        kind = "parâmetro desconhecido" if where and where[-1] == "parameters" else "campo desconhecido"
-        hint = f" (aceitos: {', '.join(sorted(allowed))})" if allowed else ""
+        kind = "unknown parameter" if where and where[-1] == "parameters" else "unknown field"
+        hint = f" (accepted: {', '.join(sorted(allowed))})" if allowed else ""
         return f"{target}{kind}: {', '.join(unknown)}{hint}"
     if validator == "maxProperties":
-        return f"{target}este tipo não aceita parâmetros; remova: {', '.join(error.instance)}"
+        return f"{target}this type takes no parameters; remove: {', '.join(error.instance)}"
     if validator == "enum":
         options = ", ".join(str(option) for option in error.validator_value)
-        return f"{target}{name} \"{error.instance}\" não existe; use um de: {options}"
+        return f"{target}{name} \"{error.instance}\" does not exist; use one of: {options}"
     if validator in ("minimum", "maximum"):
         schema = error.schema
         if "minimum" in schema and "maximum" in schema:
-            limits = f"de {schema['minimum']} a {schema['maximum']}"
+            limits = f"from {schema['minimum']} to {schema['maximum']}"
         elif "minimum" in schema:
-            limits = f"no mínimo {schema['minimum']}"
+            limits = f"at least {schema['minimum']}"
         else:
-            limits = f"no máximo {schema['maximum']}"
-        return f"{target}{name} é {error.instance}; o valor precisa ser {limits}"
+            limits = f"at most {schema['maximum']}"
+        return f"{target}{name} is {error.instance}; the value must be {limits}"
     if validator == "pattern":
-        return f"{target}nome \"{error.instance}\" inválido: use só letras minúsculas, dígitos e _"
+        return f"{target}invalid name \"{error.instance}\": use only lower-case letters, digits, and _"
     if validator == "minItems":
-        return f"{name or where}: declare ao menos um item"
+        return f"{name or where}: declare at least one item"
     if validator == "type":
-        return f"{target}{name} tem o valor {error.instance!r}, que não é do tipo esperado ({error.validator_value})"
+        return f"{target}{name} has the value {error.instance!r}, which is not of the expected type ({error.validator_value})"
     return f"{target}{'/'.join(where)}: {error.message}"
 
 
@@ -141,7 +143,7 @@ def _duplicates(items, name_key):
 
 
 def parse_settings(strategies_text, experiments_text):
-    """Valida os dois arquivos e devolve Settings. Levanta SettingsError com todos os problemas encontrados."""
+    """Validates the two files and returns Settings. Raises SettingsError with every problem found."""
     problems = []
     strategies_file, experiments_file = "config/strategies.yaml", "config/experiments.yaml"
     strategies_data = _load_yaml(strategies_text, strategies_file, problems)
@@ -153,7 +155,7 @@ def parse_settings(strategies_text, experiments_text):
         raw_strategies = strategies_data.get("strategies")
         raw_strategies = raw_strategies if isinstance(raw_strategies, list) else []
         for name in _duplicates(raw_strategies, "name"):
-            problems.append(f"{strategies_file}: nome de estratégia repetido: \"{name}\"; cada estratégia precisa de um nome único")
+            problems.append(f"{strategies_file}: duplicate strategy name: \"{name}\"; each strategy needs a unique name")
         for raw in raw_strategies:
             if not isinstance(raw, dict) or raw.get("type") not in STRATEGY_TYPES or not isinstance(raw.get("name"), str):
                 continue
@@ -164,8 +166,8 @@ def parse_settings(strategies_text, experiments_text):
                 size, overlap = pair
                 if parameters[overlap] >= parameters[size]:
                     problems.append(
-                        f"{strategies_file}: \"{raw['name']}\": {overlap} ({parameters[overlap]}) precisa ser menor "
-                        f"que {size} ({parameters[size]})"
+                        f"{strategies_file}: \"{raw['name']}\": {overlap} ({parameters[overlap]}) must be smaller "
+                        f"than {size} ({parameters[size]})"
                     )
             strategies.setdefault(raw["name"], Strategy(raw["name"], raw["type"], parameters))
 
@@ -176,7 +178,7 @@ def parse_settings(strategies_text, experiments_text):
         raw_experiments = experiments_data.get("experiments")
         raw_experiments = raw_experiments if isinstance(raw_experiments, list) else []
         for name in _duplicates(raw_experiments, "exp_name"):
-            problems.append(f"{experiments_file}: nome de experimento repetido: \"{name}\"; cada experimento precisa de um nome único")
+            problems.append(f"{experiments_file}: duplicate experiment name: \"{name}\"; each experiment needs a unique name")
         for raw in raw_experiments:
             if not isinstance(raw, dict) or not isinstance(raw.get("exp_name"), str):
                 continue
@@ -184,13 +186,13 @@ def parse_settings(strategies_text, experiments_text):
             collection = raw.get("collection")
             if strategies_data is not None and isinstance(collection, str) and collection not in strategies:
                 problems.append(
-                    f"{experiments_file}: \"{name}\": a estratégia \"{collection}\" não existe em {strategies_file}; "
-                    f"use uma de: {', '.join(strategies) or '(nenhuma válida)'}"
+                    f"{experiments_file}: \"{name}\": the strategy \"{collection}\" does not exist in {strategies_file}; "
+                    f"use one of: {', '.join(strategies) or '(no valid one)'}"
                 )
             if raw.get("use_hyde") is True and raw.get("search_type") == "bm25":
                 problems.append(
-                    f"{experiments_file}: \"{name}\": use_hyde só funciona com busca vetorial; "
-                    "troque search_type bm25 por hybrid ou vector, ou desligue use_hyde"
+                    f"{experiments_file}: \"{name}\": use_hyde only works with vector search; "
+                    "change search_type bm25 to hybrid or vector, or turn use_hyde off"
                 )
             try:
                 experiments.setdefault(name, Experiment(
@@ -200,17 +202,18 @@ def parse_settings(strategies_text, experiments_text):
                     match_count=raw["match_count"],
                     match_threshold=float(raw.get("match_threshold", 0.0)),
                     use_hyde=raw.get("use_hyde", False),
+                    prompt=raw.get("prompt", "rules"),
                 ))
             except (KeyError, TypeError, ValueError):
-                pass  # o problema já foi listado pelo esquema
+                pass  # the schema already listed the problem
         chosen = experiments_data.get("assistant")
         if isinstance(chosen, str):
             assistant = experiments.get(chosen)
             declared = [raw.get("exp_name") for raw in raw_experiments if isinstance(raw, dict)]
             if chosen not in declared:
                 problems.append(
-                    f"{experiments_file}: assistant aponta para \"{chosen}\", que não é um experimento declarado; "
-                    f"use um de: {', '.join(str(name) for name in declared) or '(nenhum)'}"
+                    f"{experiments_file}: assistant points to \"{chosen}\", which is not a declared experiment; "
+                    f"use one of: {', '.join(str(name) for name in declared) or '(none)'}"
                 )
 
     if problems:
@@ -220,14 +223,14 @@ def parse_settings(strategies_text, experiments_text):
 
 @lru_cache(maxsize=1)
 def load_settings():
-    """Lê e valida os dois arquivos de configuração. O resultado fica em cache durante a execução."""
+    """Reads and validates the two configuration files. The result is cached for the run."""
     problems = []
     texts = []
     for path in (STRATEGIES_PATH, EXPERIMENTS_PATH):
         try:
             texts.append(path.read_text(encoding="utf-8"))
         except OSError:
-            problems.append(f"config/{path.name}: arquivo não encontrado em {path}")
+            problems.append(f"config/{path.name}: file not found at {path}")
     if problems:
         raise SettingsError(problems)
     return parse_settings(*texts)
@@ -242,21 +245,21 @@ def experiments():
 
 
 def get_strategy(name):
-    """Estratégia pelo nome. KeyError com a lista das válidas se não existir."""
+    """Strategy by name. KeyError with the list of valid ones if it does not exist."""
     found = load_settings().strategies
     if name not in found:
-        raise KeyError(f"a estratégia \"{name}\" não existe; use uma de: {', '.join(found)}")
+        raise KeyError(f"the strategy \"{name}\" does not exist; use one of: {', '.join(found)}")
     return found[name]
 
 
 def get_experiment(name):
-    """Experimento pelo nome. KeyError com a lista dos válidos se não existir."""
+    """Experiment by name. KeyError with the list of valid ones if it does not exist."""
     found = load_settings().experiments
     if name not in found:
-        raise KeyError(f"o experimento \"{name}\" não existe; use um de: {', '.join(found)}")
+        raise KeyError(f"the experiment \"{name}\" does not exist; use one of: {', '.join(found)}")
     return found[name]
 
 
 def assistant_experiment():
-    """O experimento que o chat e a avaliação da resposta usam."""
+    """The experiment that the chat and the answer evaluation use."""
     return load_settings().assistant

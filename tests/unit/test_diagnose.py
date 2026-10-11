@@ -2,12 +2,12 @@ from evaluation.dataset import Fact, Item
 from evaluation.diagnose import classify
 
 ANSWERABLE = Item(
-    id="clareamento-preco-01", question="?", category="price", procedure="clareamento", answerable=True,
-    split="dev", smoke=False, expected_facts=(Fact("money", "preço", (500, 1500)),),
-    evidence=("Investimento: R$ 500 a R$ 1.500",),
+    id="whitening-price-01", question="?", category="price", procedure="whitening", answerable=True,
+    split="dev", smoke=False, expected_facts=(Fact("money", "price", (180, 450)),),
+    evidence=("Price: $180–$450",),
 )
 UNANSWERABLE = Item(
-    id="fora-endereco-01", question="?", category="out_of_scope", procedure=None, answerable=False,
+    id="out-insurance-01", question="?", category="out_of_scope", procedure=None, answerable=False,
     split="dev", smoke=False,
 )
 
@@ -19,7 +19,7 @@ def result(passed=False, hit=True, anchored=True, found=True, unexpected=(), ung
     return {
         "passed": passed,
         "retrieval": retrieval,
-        "facts": [{"label": "preço", "found": found}] if answerable else [],
+        "facts": [{"label": "price", "found": found}] if answerable else [],
         "unexpected_values": list(unexpected),
         "ungrounded_values": list(ungrounded),
         "abstained": abstained,
@@ -36,7 +36,7 @@ def test_unanswerable_question_that_was_answered_is_fabricated():
 
 
 def test_unanswerable_question_refused_but_with_values_is_fabricated():
-    outcome = result(answerable=False, abstained=True, unexpected=["R$ 500"])
+    outcome = result(answerable=False, abstained=True, unexpected=["$180"])
 
     assert classify(UNANSWERABLE, outcome)[0] == "fabricated"
 
@@ -46,7 +46,7 @@ def test_evidence_not_retrieved_is_retrieval_failure():
 
 
 def test_retrieval_failure_wins_over_refusal_and_fabrication():
-    outcome = result(hit=False, found=False, abstained=True, ungrounded=["R$ 99"], unexpected=["R$ 99"])
+    outcome = result(hit=False, found=False, abstained=True, ungrounded=["$99"], unexpected=["$99"])
 
     assert classify(ANSWERABLE, outcome)[0] == "retrieval_failure"
 
@@ -56,13 +56,13 @@ def test_evidence_retrieved_and_refused_is_wrong_refusal():
 
 
 def test_evidence_retrieved_and_value_outside_chunks_is_fabricated():
-    outcome = result(found=False, unexpected=["R$ 99"], ungrounded=["R$ 99"])
+    outcome = result(found=False, unexpected=["$99"], ungrounded=["$99"])
 
     assert classify(ANSWERABLE, outcome)[0] == "fabricated"
 
 
 def test_evidence_retrieved_and_wrong_fact_is_answer_failure():
-    assert classify(ANSWERABLE, result(found=False, unexpected=["R$ 120", "R$ 250"]))[0] == "answer_failure"
+    assert classify(ANSWERABLE, result(found=False, unexpected=["$40", "$85"]))[0] == "answer_failure"
 
 
 def test_evidence_retrieved_and_missing_fact_is_answer_failure():
@@ -77,28 +77,28 @@ def test_flag_evidence_not_anchored():
 
 
 def test_flag_other_procedure_value():
-    outcome = result(found=False, unexpected=["R$ 120", "R$ 250"])
+    outcome = result(found=False, unexpected=["$40", "$85"])
 
-    assert classify(ANSWERABLE, outcome, other_procedure_labels=["R$ 120", "R$ 250"])[1] == ["other_procedure_value"]
+    assert classify(ANSWERABLE, outcome, other_procedure_labels=["$40", "$85"])[1] == ["other_procedure_value"]
 
 
 def test_flags_are_reported_even_when_the_item_passed():
     assert classify(ANSWERABLE, result(passed=True, anchored=False)) == (None, ["evidence_not_anchored"])
 
 
-# --- regras de atendimento (US4) ---
+# --- service rules ---
 
 def test_right_facts_with_rule_violation_is_rule_violation():
-    assert classify(ANSWERABLE, result(violations=["forbidden_term:contexto"]))[0] == "rule_violation"
+    assert classify(ANSWERABLE, result(violations=["forbidden_term:context"]))[0] == "rule_violation"
 
 
 def test_wrong_facts_with_rule_violation_keeps_the_higher_cause():
-    outcome = result(found=False, violations=["forbidden_term:contexto"])
+    outcome = result(found=False, violations=["forbidden_term:context"])
 
     assert classify(ANSWERABLE, outcome)[0] == "answer_failure"
 
 
 def test_correct_refusal_with_rule_violation_is_rule_violation():
-    outcome = result(answerable=False, abstained=True, violations=["forbidden_term:contexto"])
+    outcome = result(answerable=False, abstained=True, violations=["forbidden_term:context"])
 
     assert classify(UNANSWERABLE, outcome)[0] == "rule_violation"
