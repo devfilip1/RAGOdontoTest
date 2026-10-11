@@ -1,141 +1,164 @@
-# Avaliação do assistente OdontoTest
+# Evaluation of the DentalSafe assistant
 
-Mede a qualidade das respostas do assistente com um conjunto fixo de perguntas (o gabarito) e guarda o resultado de cada execução, para comparar antes e depois de uma mudança.
+Measures the quality of the assistant's answers with a fixed set of questions (the answer key) and stores the result of each run, so you can compare before and after a change.
 
-Todos os comandos rodam da raiz do projeto, com o ambiente virtual ativo e o Ollama em execução.
+Every command runs from the project root, with the virtual environment active and Ollama running.
 
-## Ciclo de uso
+## Workflow
 
 ```powershell
-# 1. mude algo no assistente (config/*.yaml, prompt, modelo)
-python -m assistant.ingest                         # só se mudou uma estratégia ou o PDF
-python -m evaluation experiments                   # se a mudança é de busca: compare as configurações
-# 2. rode a avaliação da resposta
-python -m evaluation run --label o-que-mudei
-# 3. o placar já mostra a comparação com a referência; para rever depois:
+# 1. change something in the assistant (config/*.yaml, prompt, model)
+python -m assistant.ingest                         # only if a strategy or the PDF changed
+python -m evaluation experiments                   # if the change is about search: compare the configurations
+# 2. run the answer evaluation
+python -m evaluation run --label what-i-changed
+# 3. the scoreboard already shows the comparison with the reference; to see it again later:
 python -m evaluation compare
-# 4. se a mudança ficou, ela vira a nova referência
+# 4. if the change stays, it becomes the new reference
 python -m evaluation baseline set
 ```
 
-Durante os ajustes, use `--smoke` (10 perguntas) e `--no-judge` para ter resposta em menos de um minuto.
+While adjusting, use `--smoke` (10 questions) and `--no-judge` to get an answer in a few seconds.
 
-## Comandos
+## Commands
 
-| Comando | O que faz |
+| Command | What it does |
 |---|---|
-| `run` | Roda o recorte `dev` e grava em `evaluation/runs/<id>/` (`run.json` e `report.md`) |
-| `run --smoke` | Só as perguntas da avaliação reduzida |
-| `run --holdout` | Só a parte reservada (ver abaixo) |
-| `run --no-judge` | Sem as métricas de comportamento, bem mais rápido |
-| `run --repeat N` | Roda N vezes e mostra a variação de cada métrica |
-| `run --experiment NOME` | Roda a avaliação da resposta com outro experimento de `config/experiments.yaml`, sem editar o arquivo |
-| `experiments [NOMES] [--verbose]` | Roda os experimentos de busca e mostra a tabela comparativa (ver abaixo) |
-| `retrieval [--experiment NOME]` | Detalhe da busca de um experimento: métricas por fonte e as perguntas em que a evidência não chegou ao modelo |
-| `compare [BASE] [CANDIDATA]` | Compara duas execuções; sem argumentos, a referência contra a mais recente |
-| `baseline set [ID]` / `baseline show` | Marca ou mostra a execução de referência |
-| `list` | Lista as execuções gravadas |
-| `kb-check [--strategy NOME]` | Verifica o índice de uma estratégia, sem usar modelo |
-| `validate` | Valida a configuração e o gabarito; lista as estratégias, o estado de cada índice e os experimentos |
-| `calibrate export` / `calibrate score` | Confere o juiz contra a sua avaliação |
+| `run` | Runs the `dev` subset and saves it in `evaluation/runs/<id>/` (`run.json` and `report.md`) |
+| `run --smoke` | Only the questions of the quick evaluation |
+| `run --holdout` | Only the reserved part (see below) |
+| `run --no-judge` | Without the behaviour metrics, much faster |
+| `run --repeat N` | Runs N times and shows the variation of each metric |
+| `run --experiment NAME` | Runs the answer evaluation with another experiment from `config/experiments.yaml`, without editing the file. `--experiment original_baseline` measures where the project started |
+| `experiments [NAMES] [--verbose]` | Runs the search experiments and shows the comparison table (see below) |
+| `retrieval [--experiment NAME]` | Search detail of one experiment: metrics per source and the questions in which the evidence did not reach the model |
+| `compare [BASE] [CANDIDATE]` | Compares two runs; with no arguments, the reference against the most recent one |
+| `baseline set [ID]` / `baseline show` | Sets or shows the reference run |
+| `list` | Lists the saved runs |
+| `kb-check [--strategy NAME]` | Checks the index of a strategy, without using a model |
+| `validate` | Validates the configuration and the answer key; lists the strategies, the state of each index, and the experiments |
+| `calibrate export` / `calibrate score` | Checks the judge against your own evaluation |
 
-## Como ler o placar
+## Current results
 
-**Nota geral** é a fração de perguntas certas. Uma pergunta está certa quando:
+Measured on 2026-10-11 with `llama3`, `nomic-embed-text`, and the `section_hybrid` experiment. The runs are stored in `evaluation/runs/`.
 
-- tem resposta no material: todos os fatos esperados aparecem, não aparece nenhum valor estranho e nenhuma regra de atendimento é violada;
-- não tem resposta no material: o assistente diz que não tem a informação e não cita preço nem prazo.
+| Run | Subset | Overall score | Typical answer time |
+|---|---|---|---|
+| `20261011-132450-reference` | dev, 51 questions | 98.0% (50 of 51) | 0.6 s |
+| `20261011-132527-reference-holdout` | reserved part, 21 questions | 90.5% (19 of 21) | 0.7 s |
 
-**Resposta (determinístico)** e **Busca** são calculadas por comparação de texto e de valores, sem modelo. A mesma resposta sempre recebe a mesma nota.
+| `20261011-140604-original-baseline` | dev, with the `original_baseline` experiment | 29.4% (15 of 51) | 0.6 s |
 
-- "R$ 1.500", "1500 reais" e "mil e quinhentos reais" contam como o mesmo valor; "1 hora" e "60 minutos" também.
-- Na busca, um trecho é relevante quando contém a evidência do gabarito. **Evidência ancorada** mede se esse trecho também tem o nome do procedimento. Evidência recuperada e não ancorada é o cenário em que o modelo recebe um preço sem saber de qual procedimento é.
-- As três linhas da busca mostram a contribuição da busca vetorial, da lexical e do conjunto que vai para o modelo.
+The last row is where the project started (500-character chunks, vector search with 3 chunks, generic prompt), measured on the same questions. Its factual accuracy is 90.9%, but it refuses only 28.6% of what the brochure does not answer and breaks a service rule in two thirds of the answers, mostly by opening with "According to the context".
 
-**Comportamento (juiz)** é a opinião de um modelo local sobre tom, objetividade, convite ao agendamento, relevância e fidelidade. Não entra na nota geral. Só confie em um critério depois de conferi-lo com `calibrate`: abaixo de 80% de concordância com você, o placar marca o critério como não confiável.
+The three wrong answers of the two reference runs are all attempts to break the assistant's role: it repeated "according to our information" twice, and once it played along with a request to answer as a pirate. Every factual question was answered correctly in both subsets.
 
-**Causa dos erros** diz onde mexer:
+## How to read the scoreboard
 
-| Causa | Onde está o problema |
+**Overall score** is the fraction of right questions. A question is right when:
+
+- the brochure answers it: every expected fact appears, no stray value appears, and no service rule is broken;
+- the brochure does not answer it: the assistant says it does not have the information and mentions no price, duration, or opening time.
+
+**Answer (deterministic)** and **Search** are computed by comparing text and values, with no model. The same answer always gets the same score.
+
+- "$1,500", "1500 dollars", and "one thousand five hundred dollars" count as the same value; so do "1 hour" and "60 minutes", and "9:00 AM", "9 am", and "9 a.m.".
+- In the search, a chunk is relevant when it contains the evidence from the answer key. **Anchored evidence** measures whether that chunk also has the name of the procedure. Evidence retrieved without its anchor is the case in which the model receives a price without knowing which procedure it belongs to.
+- The three rows of the search show the contribution of the vector search, of the word-based search, and of the set that goes to the model.
+
+**Behaviour (judge)** is the opinion of a local model about tone, conciseness, invitation to schedule, relevance, and faithfulness. It is not part of the overall score. Only trust a criterion after checking it with `calibrate`: below 80% agreement with you, the scoreboard marks the criterion as not reliable. In the run `20261011-132553-with-judge` the judge gave 5.9% for conciseness to answers of one or two sentences, which shows why it must be checked before being trusted.
+
+**Cause of the errors** tells you where to look:
+
+| Cause | Where the problem is |
 |---|---|
-| Falha de busca | O trecho com a resposta não foi recuperado: divisão do material ou busca |
-| Falha de resposta | O trecho foi recuperado e a resposta saiu errada: prompt, modelo ou contexto confuso |
-| Informação inventada | A resposta traz valor que não está nos trechos, ou responde o que o material não diz |
-| Recusa indevida | O trecho foi recuperado e o assistente disse que não tem a informação |
-| Violação de regra de atendimento | Fatos certos, mas citou "contexto", "documento" ou "base de dados", respondeu fora do português ou longo demais |
+| Search failure | The chunk with the answer was not retrieved: chunking or search |
+| Answer failure | The chunk was retrieved and the answer came out wrong: prompt, model, or confusing context |
+| Made-up information | The answer has a value that is not in the chunks, or answers what the brochure does not say |
+| Wrong refusal | The chunk was retrieved and the assistant said it does not have the information |
+| Service rule violation | Right facts, but it said where the knowledge comes from ("according to", "context", "document", "brochure", "database"), answered in a language other than English, or was too long |
 
-## Bancada de experimentos de busca
+## Bench of search experiments
 
-`python -m evaluation experiments` roda cada experimento de `config/experiments.yaml` sobre as 38 perguntas com resposta do conjunto de trabalho. Ele mede **só a busca**, sem gerar respostas, por isso leva segundos.
+`python -m evaluation experiments` runs each experiment of `config/experiments.yaml` over the 44 answerable questions of the dev subset. It measures **only the search**, without generating answers, so it takes seconds.
 
 ```text
-|        Experiment        | Strategy |     Collection    | Threshold | Count |  HyDE | Score | True Rate | Anchored |  Time |
-|      section_hybrid      |  hybrid  |      section      |    0.00   |   4   | False |  0.67 |   37/38   |  100.0%  | 39 ms |
-|       page_hybrid        |  hybrid  |        page       |    0.00   |   4   | False |  0.64 |   37/38   |  81.8%   | 36 ms |
-| recursive_500_200_hybrid |  hybrid  | recursive_500_200 |    0.00   |   4   | False |  0.67 |   31/38   |  81.8%   | 35 ms |
+|        Experiment        | Strategy |     Collection    | Threshold | Count |  HyDE | Score | True Rate | Anchored |   Time  |
+|      section_hybrid      |  hybrid  |      section      |    0.00   |   4   | False |  0.66 |   44/44   |  100.0%  |  40 ms  |
+|       section_bm25       |   bm25   |      section      |    0.00   |   4   | False |  0.64 |   44/44   |  100.0%  |  33 ms  |
+|       page_hybrid        |  hybrid  |        page       |    0.00   |   4   | False |  0.61 |   44/44   |  100.0%  |  35 ms  |
+|   section_hybrid_hyde    |  hybrid  |      section      |    0.00   |   4   |  True |  0.75 |   44/44   |  100.0%  | 1244 ms |
+|      section_vector      |  vector  |      section      |    0.00   |   4   | False |  0.64 |   43/44   |  100.0%  |  34 ms  |
+| recursive_500_200_hybrid |  hybrid  | recursive_500_200 |    0.00   |   4   | False |  0.66 |   41/44   |  94.9%   |  34 ms  |
+|    section_hybrid_t60    |  hybrid  |      section      |    0.60   |   4   | False |  0.57 |   36/44   |  82.1%   |  38 ms  |
 ```
 
-| Coluna | O que é |
+This table is the round stored in `runs/experiments/20261011-131829-summary.csv`. Four of its experiments are commented out in `config/experiments.yaml`; uncomment them to measure again.
+
+| Column | What it is |
 |---|---|
-| `Strategy` | Tipo de busca: `hybrid`, `vector` ou `bm25` |
-| `Collection` | Estratégia de divisão usada |
-| `Threshold`, `Count`, `HyDE` | Parâmetros do experimento |
-| `True Rate` | Perguntas em que **todas** as evidências do gabarito vieram entre os trechos. É a coluna que mede acerto |
-| `Score` | Média da similaridade (cosseno, de 0 a 1) entre a pergunta e os trechos devolvidos |
-| `Anchored` | Perguntas em que o trecho com a evidência também traz o nome do procedimento |
-| `Time` | Tempo médio da busca por pergunta, incluindo a geração do HyDE quando ligado |
+| `Strategy` | Search type: `hybrid`, `vector`, or `bm25` |
+| `Collection` | Chunking strategy used |
+| `Threshold`, `Count`, `HyDE` | Parameters of the experiment |
+| `True Rate` | Questions in which **every** evidence of the answer key came among the chunks. This is the column that measures hits |
+| `Score` | Mean similarity (cosine, from 0 to 1) between the question and the returned chunks |
+| `Anchored` | Questions in which the chunk with the evidence also carries the name of the procedure |
+| `Time` | Mean search time per question, including HyDE's generation when it is on |
 
-Cuidados ao ler:
+What to keep in mind when reading it:
 
-- **O Score não mede acerto.** Ele diz o quanto os trechos se parecem com a pergunta. A divisão por caracteres tem o mesmo Score da divisão por seção (0,67) e erra 6 perguntas a mais.
-- **O Score só é comparável** entre experimentos com o mesmo modelo de embedding e a mesma opção de HyDE. Com HyDE a similaridade é medida contra a resposta hipotética e sai mais alta (0,78 contra 0,67 na medição de 10/10/2026), sem recuperar nenhuma evidência a mais.
-- **A ordem é por True Rate**, depois por Score. No empate, experimentos com HyDE ficam depois dos sem.
-- **A bancada não vê a resposta.** Duas configurações com o mesmo True Rate podem dar respostas de qualidade diferente. Antes de adotar um experimento, rode `python -m evaluation run --experiment NOME` e compare com a referência.
+- **Score does not measure hits.** It says how similar the chunks are to the question. Character-based chunking has the same Score as section-based chunking (0.66) and misses 3 more questions.
+- **Score is only comparable** between experiments with the same embedding model and the same HyDE option. With HyDE the similarity is measured against the hypothetical answer and comes out higher (0.75 against 0.66), without retrieving any extra evidence.
+- **The order is by True Rate**, then by Score. On a tie, experiments with HyDE come after the ones without.
+- **The bench does not see the answer.** Two configurations with the same True Rate can give answers of different quality. Before adopting an experiment, run `python -m evaluation run --experiment NAME` and compare with the reference.
 
-Cada execução grava dois arquivos em `runs/experiments/`: `<data-hora>-summary.csv`, com a tabela, e `<data-hora>-questions.csv`, com uma linha por experimento e pergunta. O segundo mostra quais perguntas cada experimento erra. Os arquivos usam `;` como separador e abrem direto no Excel.
+Each run writes two files in `runs/experiments/`: `<date-time>-summary.csv`, with the table, and `<date-time>-questions.csv`, with one row per experiment and question. The second one shows which questions each experiment misses. The files are comma-separated, in UTF-8.
 
-Um experimento cujo índice está ausente ou desatualizado aparece como não executado, com o comando que resolve, e os outros rodam normalmente. A parte reservada do gabarito nunca entra na bancada.
+An experiment whose index is missing or out of date shows up as not run, with the command that fixes it, and the others run normally. The reserved part of the answer key never enters the bench.
 
-## Limites do que é medido
+## Limits of what is measured
 
-- A conferência é por valor, não por frase. Se a resposta atribui o tempo da limpeza ao clareamento e os dois valores são fatos da pergunta, a nota determinística não percebe. O critério "fidelidade" do juiz existe para esses casos.
-- A recusa é reconhecida por uma lista de frases em `answer_metrics.py` (`ABSTENTION_PATTERNS`). A frase que o assistente usa está em `assistant/pipeline.py` (`NO_ANSWER`); se ela mudar, atualize a lista.
-- A avaliação roda com `temperature=0` e `seed=42`. O chat (`python -m assistant.chat`) também usa temperatura 0, sem `seed` fixo.
-- Só perguntas de uma mensagem. Conversas com várias trocas não são avaliadas.
+- The check is by value, not by sentence. If the answer assigns the duration of the cleaning to the whitening and both values are facts of the question, the deterministic score does not notice. The judge's "faithfulness" criterion exists for those cases.
+- A refusal is recognized by a list of phrases in `answer_metrics.py` (`ABSTENTION_PATTERNS`). The sentence the assistant uses is in `assistant/pipeline.py` (`NO_ANSWER`); if it changes, update the list. A unit test ties the two together.
+- The evaluation runs with `temperature=0` and `seed=42`. The chat (`python -m assistant.chat`) also uses temperature 0, with no fixed `seed`.
+- Only single-message questions. Conversations with several turns are not evaluated.
 
-## Gabarito
+## Answer key
 
-Fica em `data/gabarito.json`. O formato está em `schemas/gabarito.schema.json`.
+It lives in `data/answer_key.json`. The format is in `schemas/answer_key.schema.json`. The current version has 72 questions: 51 in `dev` and 21 reserved, 10 of which the brochure cannot answer.
 
-Para acrescentar uma pergunta:
+To add a question:
 
-1. Copie um item parecido e troque `id` (único, nunca reaproveitado), `question`, `category` e `procedure`.
-2. Em `expected_facts`, liste o que a resposta precisa conter. Use `money` e `duration` para valores e `text` para o resto. Em `text`, basta uma das `alternatives` aparecer.
-3. Em `evidence`, cole a linha do PDF onde está a resposta. Ela precisa aparecer uma única vez no material; se aparecer mais, cole um trecho maior.
-4. Pergunta sem resposta no material: `"answerable": false`, sem `expected_facts` nem `evidence`.
-5. Suba `version` e rode `python -m evaluation validate`.
+1. Copy a similar item and change `id` (unique, never reused), `question`, `category`, and `procedure`.
+2. In `expected_facts`, list what the answer must contain. Use `money`, `duration`, and `time` for values and `text` for the rest. A `time` fact is a clock time in minutes after midnight (9:00 AM is 540). In `text`, it is enough for one of the `alternatives` to appear.
+3. In `evidence`, paste the line of the PDF where the answer is. It must appear exactly once in the brochure; if it appears more often, paste a longer piece.
+4. Question with no answer in the brochure: `"answerable": false`, with no `expected_facts` or `evidence`.
+5. Bump `version` and run `python -m evaluation validate`.
 
-A resposta pode citar, sem contar como erro, outros fatos do mesmo procedimento que estejam no gabarito e os diferenciais da clínica. Para liberar um valor que não é fato de nenhuma pergunta, use `allowed_facts`.
+The answer may mention, without it counting as an error, other facts of the same procedure that are in the answer key and what sets the clinic apart (the `differentials` questions). To allow a value that is not a fact of any question, use `allowed_facts`.
 
-Depois de mudar o gabarito, rode a avaliação de novo e marque a nova referência: execuções com gabaritos diferentes não são diretamente comparáveis, e `compare` avisa quando isso acontece.
+Questions about the address, opening hours, and contact use the `clinic_info` category and the `clinic` entry of `procedures`, which is not a treatment and therefore is not required to have price, duration, and result questions.
 
-### Parte reservada
+After changing the answer key, run the evaluation again and set the new reference: runs with different answer keys are not directly comparable, and `compare` warns when that happens.
 
-Cerca de um quarto das perguntas tem `"split": "holdout"` e não entra em `run`. A regra é não olhar para elas enquanto ajusta o assistente. Depois de uma rodada de melhorias, `python -m evaluation run --holdout` mostra se o ganho vale para perguntas que não guiaram os ajustes. Se a nota do `dev` sobe e a da parte reservada não, o assistente foi ajustado para o gabarito e não para o problema.
+### Reserved part
 
-## Conferir o juiz
+About a quarter of the questions have `"split": "holdout"` and do not enter `run`. The rule is not to look at them while adjusting the assistant. After a round of improvements, `python -m evaluation run --holdout` shows whether the gain holds for questions that did not guide the adjustments. If the `dev` score goes up and the reserved one does not, the assistant was adjusted to the answer key and not to the problem.
+
+## Checking the judge
 
 ```powershell
-python -m evaluation calibrate export      # gera data/human_labels.json com 20 respostas
-# preencha cada "human" com true ou false, seguindo os critérios descritos no arquivo
+python -m evaluation calibrate export      # writes data/human_labels.json with 20 answers
+# fill each "human" with true or false, following the criteria described in the file
 python -m evaluation calibrate score
 ```
 
-Para trocar o modelo do juiz, defina `OLLAMA_JUDGE_MODEL` (o padrão é o mesmo modelo do chat). A conferência vale para um modelo de juiz; ao trocar, confira de novo.
+To change the judge model, set `OLLAMA_JUDGE_MODEL` (the default is the chat model). The check is valid for one judge model; when you change it, check again.
 
-## Testes
+## Tests
 
 ```powershell
-pytest                    # testes de unidade, sem Ollama
-pytest -m integration     # usa o Ollama e o índice de verdade
+pytest                    # unit tests, no Ollama needed
+pytest -m integration     # uses Ollama and the real index
 ```

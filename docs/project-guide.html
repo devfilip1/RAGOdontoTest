@@ -1,0 +1,526 @@
+<title>RagLab Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: fixed index on the left, text in a reading column on the right; a single column on phones. */
+  :root {
+    --bg: #f2f5f5;
+    --surface: #ffffff;
+    --sunken: #e6ecec;
+    --ink: #13292d;
+    --muted: #54696d;
+    --line: #cfd9da;
+    --accent: #0a6c78;
+    --accent-soft: #d8ecee;
+    --good: #1c7a4c;
+    --warn: #9a5b00;
+    --warn-soft: #f6ead3;
+    --bad: #b03a2e;
+    --bad-soft: #f6dedb;
+    --code-bg: #10262a;
+    --code-ink: #dcebed;
+    --code-muted: #8fa9ad;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1b1e; --surface: #142629; --sunken: #1b3135; --ink: #e3eeef; --muted: #96adb1;
+      --line: #2a4449; --accent: #5cc4d1; --accent-soft: #173a40; --good: #63c794; --warn: #e0b060;
+      --warn-soft: #3a2f17; --bad: #ee8f84; --bad-soft: #40211e; --code-bg: #091416; --code-ink: #dcebed;
+      --code-muted: #7f999d; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1b1e; --surface: #142629; --sunken: #1b3135; --ink: #e3eeef; --muted: #96adb1;
+    --line: #2a4449; --accent: #5cc4d1; --accent-soft: #173a40; --good: #63c794; --warn: #e0b060;
+    --warn-soft: #3a2f17; --bad: #ee8f84; --bad-soft: #40211e; --code-bg: #091416; --code-ink: #dcebed;
+    --code-muted: #7f999d; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+  .page { max-width: 1120px; margin-inline: auto; padding-inline: 20px; padding-block: 40px 80px;
+          display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 48px; }
+  main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+  section { display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 24px; }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+  h1 { font-size: clamp(2rem, 5vw, 2.9rem); font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 1.1rem; font-weight: 500; }
+  p, ul, ol { margin: 0; max-width: 68ch; }
+  ul, ol { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 6px; }
+  a { color: var(--accent); }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--sunken); padding: 1px 5px; border-radius: 4px; }
+  .lede { font-size: 1.12rem; color: var(--muted); }
+  .eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+
+  nav { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start;
+        display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
+  nav .eyebrow { margin-bottom: 8px; }
+  nav a { color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; }
+  nav a:hover, nav a:focus-visible { color: var(--ink); background: var(--sunken); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px;
+           background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .facts div { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+  .facts b { font-family: var(--display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .facts span { font-size: 0.85rem; color: var(--muted); }
+
+  .cmd { background: var(--code-bg); color: var(--code-ink); border-radius: 10px; overflow: hidden; }
+  .cmd pre { margin: 0; padding: 16px 18px; overflow-x: auto; font-family: var(--mono); font-size: 0.86rem; line-height: 1.7; }
+  .cmd .c { color: var(--code-muted); }
+  .cmd-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 8px 6px 18px;
+             border-bottom: 1px solid #ffffff1f; font-family: var(--mono); font-size: 0.72rem; color: var(--code-muted);
+             letter-spacing: 0.06em; text-transform: uppercase; }
+  .copy { font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--code-ink); background: #ffffff14;
+          border: 1px solid #ffffff2b; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .copy:hover { background: #ffffff26; }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+  .step { flex: 1 1 130px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+          padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .step b { font-family: var(--display); font-weight: 500; }
+  .step span { font-size: 0.84rem; color: var(--muted); }
+  .step code { align-self: flex-start; }
+  .step.model { background: var(--accent-soft); border-color: var(--accent); }
+  .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; flex: 0 0 auto; }
+  .split { flex: 1 1 150px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .split .step { flex: 1 1 auto; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted);
+       font-weight: 500; background: var(--sunken); white-space: nowrap; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+  td code { white-space: nowrap; }
+  .bar { display: block; height: 6px; width: 110px; background: var(--sunken); border-radius: 3px; margin-top: 6px; }
+  .bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+  .bar.low i { background: var(--bad); }
+
+  .note { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; max-width: 72ch; }
+  .note b { color: var(--warn); }
+
+  .example { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px;
+             font-family: var(--mono); font-size: 0.85rem; line-height: 1.75; overflow-x: auto; white-space: pre; }
+  .example .x { color: var(--bad); font-weight: 500; }
+  .example .k { color: var(--muted); }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tabs button { font: inherit; font-size: 0.9rem; color: var(--muted); background: transparent; border: 1px solid var(--line);
+                 border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { color: var(--surface); background: var(--accent); border-color: var(--accent); }
+  .files { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; }
+  .files > div { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .files > div:last-child { border-bottom: 0; }
+  .files code { background: none; padding: 0; color: var(--accent); font-weight: 500; overflow-wrap: anywhere; }
+  .files p { font-size: 0.93rem; }
+
+  .cycle { counter-reset: step; list-style: none; padding: 0; gap: 12px; max-width: none; }
+  .cycle li { counter-increment: step; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 14px; align-items: start; }
+  .cycle li::before { content: counter(step); font-family: var(--display); font-weight: 700; width: 32px; height: 32px; border-radius: 50%;
+                      background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+  .cycle li > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .cycle code { align-self: flex-start; }
+
+  footer { color: var(--muted); font-size: 0.85rem; }
+
+  @media (max-width: 860px) {
+    .page { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 24px 56px; }
+    nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+    nav .eyebrow { flex-basis: 100%; margin-bottom: 2px; }
+    nav a { background: var(--sunken); }
+    .files > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .flow { flex-direction: column; }
+    .step, .split { flex: 0 0 auto; }
+    .arrow { transform: rotate(90deg); }
+  }
+</style>
+
+<div class="page">
+  <nav aria-label="On this page">
+    <span class="eyebrow">On this page</span>
+    <a href="#overview">Overview</a>
+    <a href="#how">How it works</a>
+    <a href="#setup">Setup</a>
+    <a href="#use">Using the assistant</a>
+    <a href="#testing">How to test</a>
+    <a href="#scoreboard">Reading the scoreboard</a>
+    <a href="#bench">Search bench</a>
+    <a href="#cycle">Improvement cycle</a>
+    <a href="#files">File map</a>
+    <a href="#change">Where to change</a>
+    <a href="#caveats">Caveats</a>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <span class="eyebrow">Project guide</span>
+      <h1>RagLab</h1>
+      <p class="lede">An assistant that answers customer questions for a dental clinic from a 3-page PDF, and an evaluation that measures whether it is answering correctly.</p>
+      <p>The project has two halves. The <b>assistant</b> searches the clinic's brochure for the chunks closest to the question and asks a local model to answer using only them. The <b>evaluation</b> asks 72 questions with a known answer, checks each reply, and stores the result, so you know whether a change made the assistant better or worse. The clinic, DentalSafe, is fictional.</p>
+      <div class="facts">
+        <div><b>98.0%</b><span>overall score on the 51 working questions</span></div>
+        <div><b>90.5%</b><span>on the 21 reserved questions, not used for tuning</span></div>
+        <div><b>44/44</b><span>questions in which the search brings the right evidence</span></div>
+        <div><b>0.6 s</b><span>typical time of one answer</span></div>
+      </div>
+      <p>Everything runs on your computer, with Ollama. Nothing is sent to external services.</p>
+    </section>
+
+    <section id="how">
+      <h2>How it works</h2>
+      <h3>1. Preparing the brochure, once</h3>
+      <p>The PDF is read and chunked according to a <b>strategy</b> declared in <code>config/strategies.yaml</code>. The strategy in use is section-based chunking: each treatment becomes a chunk that starts with its own name and carries its price, duration, and result. The opening of the brochure, with the address, hours, and contact, becomes a chunk of its own. Each strategy builds its index in <code>data/index/&lt;name&gt;/</code>, and the chunks are stored in two ways: as vectors, for the search by meaning, and as text, for the search by words.</p>
+      <div class="flow">
+        <div class="step"><b>Clinic PDF</b><span>8 treatments, clinic information, and what sets it apart</span><code>data/source</code></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Section chunking</b><span>11 chunks: 8 treatments, the clinic block, the differentials, and the call to schedule</span><code>ingest.py</code></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="split">
+          <div class="step"><b>Vector index</b><span>Chroma, with the nomic-embed-text model</span></div>
+          <div class="step"><b>Chunk file</b><span>chunks.json, for the word-based search</span></div>
+        </div>
+      </div>
+
+      <h3>2. For each question</h3>
+      <p>The search follows the <b>experiment</b> named in the <code>assistant:</code> line of <code>config/experiments.yaml</code>. Today that is <code>section_hybrid</code>: two searches run over the same chunks and each contributes its 2 best. Without the repeated ones, 2 to 4 chunks go into the prompt, ordered by the position they had in the two searches. The word-based search ignores plurals and stop words, and translates the customer's wording into the brochure's: "cost" also looks for "price", and "where" also looks for "location".</p>
+      <div class="flow">
+        <div class="step"><b>Question</b><span>"How much is teeth whitening?"</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="split">
+          <div class="step"><b>Vector search</b><span>2 chunks with a similar meaning</span></div>
+          <div class="step"><b>Word-based search (BM25)</b><span>2 chunks with the same words</span></div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Fusion</b><span>2 to 4 chunks, no repetition</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step model"><b>llama3</b><span>fixed rules, then the chunks and the question</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Answer</b></div>
+      </div>
+      <p>The service rules tell the model to copy the values as written, to use only the chunk of the treatment asked about, to do no arithmetic, to answer in English, and, when the answer is not in the brochure, to reply "I don't have that information right now." instead of making something up.</p>
+      <p>All of this is in <code>assistant/pipeline.py</code>, in two functions: <code>retrieve()</code> runs the searches and <code>answer()</code> generates the reply. The chat and the evaluation call these same functions, so the evaluation measures exactly the assistant the customer uses.</p>
+
+      <h3>3. The evaluation</h3>
+      <div class="flow">
+        <div class="step"><b>Answer key</b><span>question, expected facts, and the line of the PDF with the answer</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Assistant</b><span>answers each question</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="split">
+          <div class="step"><b>Checks the search</b><span>did the right line come in the chunks?</span></div>
+          <div class="step"><b>Checks the answer</b><span>do the values match? did it make anything up?</span></div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Scoreboard</b><span>score, cause of each error, and comparison with the reference</span></div>
+      </div>
+      <p>The main check uses no model. It extracts the values from the reply and compares them with the answer key: "$1,500", "1500 dollars", and "one thousand five hundred dollars" count as the same value, and so do "9:00 AM" and "9 am".</p>
+    </section>
+
+    <section id="setup">
+      <h2>Setup</h2>
+      <p>Requires Python 3.14 and Ollama running.</p>
+      <div class="cmd">
+        <div class="cmd-bar"><span>PowerShell, at the project root</span><button class="copy" type="button">Copy</button></div>
+<pre>python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+ollama pull llama3
+ollama pull nomic-embed-text
+
+python -m assistant.ingest      <span class="c"># builds the indexes in data/index/</span></pre>
+      </div>
+      <p>Every time you open a new terminal, activate the environment with <code>.venv\Scripts\Activate.ps1</code> (on Linux or macOS, <code>source .venv/bin/activate</code>), or use the shortcuts below, which do not need it.</p>
+    </section>
+
+    <section id="use">
+      <h2>Using the assistant</h2>
+      <div class="cmd">
+        <div class="cmd-bar"><span>Chat on the terminal</span><button class="copy" type="button">Copy</button></div>
+<pre>python -m assistant.chat        <span class="c"># type "exit" to close</span></pre>
+      </div>
+      <h3>Shortcuts</h3>
+      <p>The everyday commands have short names, which work without activating the virtual environment. The <code>Makefile</code> has the same names, for anyone with <code>make</code> installed.</p>
+      <div class="cmd">
+        <div class="cmd-bar"><span>PowerShell, at the project root</span><button class="copy" type="button">Copy</button></div>
+<pre>.\run.ps1 help                  <span class="c"># lists the 15 shortcuts</span>
+.\run.ps1 chat
+.\run.ps1 experiments           <span class="c"># compares the search configurations</span>
+.\run.ps1 eval --label what-i-changed</pre>
+      </div>
+      <p>The answer appears while it is being written. The assistant does not remember earlier questions: each question is answered on its own.</p>
+      <p>Run <code>python -m assistant.ingest</code> again whenever you replace the PDF or change the chunking. The chat and the evaluation refuse to run with an out-of-date index and tell you which command fixes it.</p>
+    </section>
+
+    <section id="testing">
+      <h2>How to test</h2>
+      <p>There are three kinds of test, and each one answers a different question.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Command</th><th>Answers</th><th>Time</th><th>Needs Ollama</th></tr></thead>
+          <tbody>
+            <tr><td><code>pytest</code></td><td>Is the code right? 377 tests: the configuration, the chunking of the PDF, the search, the bench, the extraction of values, the metrics, and the history.</td><td class="num">4 s</td><td>No</td></tr>
+            <tr><td><code>pytest -m integration</code></td><td>Does the real assistant work? Checks that the indexes are up to date with the PDF and the strategies, that it answers a price and the opening hours correctly, that it answers in English, and that it refuses what it does not know.</td><td class="num">8 s</td><td>Yes</td></tr>
+            <tr><td><code>python -m evaluation experiments</code></td><td>Which search configuration brings the right chunk in more questions? Compares every experiment in one table, without generating answers.</td><td class="num">seconds</td><td>Yes</td></tr>
+            <tr><td><code>python -m evaluation retrieval</code></td><td>In which questions does the assistant's search fail? Details one experiment.</td><td class="num">seconds</td><td>Yes</td></tr>
+            <tr><td><code>python -m evaluation kb-check</code></td><td>Is the index of a strategy sound? Looks for duplicate chunks, facts separated from the name of their procedure, and corrupted text.</td><td class="num">seconds</td><td>No</td></tr>
+            <tr><td><code>python -m evaluation run --smoke --no-judge</code></td><td>Does the assistant answer correctly? Quick version, with 10 questions.</td><td class="num">6 s</td><td>Yes</td></tr>
+            <tr><td><code>python -m evaluation run --no-judge</code></td><td>Does the assistant answer correctly? Full version, with 51 questions.</td><td class="num">33 s</td><td>Yes</td></tr>
+            <tr><td><code>python -m evaluation run</code></td><td>The same, plus the behaviour scores given by the judge.</td><td class="num">4 min</td><td>Yes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Day to day you will use almost only the evaluation. <code>pytest</code> matters when you change the code.</p>
+    </section>
+
+    <section id="scoreboard">
+      <h2>Reading the scoreboard</h2>
+      <p>Each run shows the scoreboard on the terminal and writes the same content, with every question, to <code>evaluation/runs/&lt;id&gt;/report.md</code>. These are the numbers of the current reference, run <code>20261011-132450-reference</code>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Metric</th><th>Score</th><th>What it measures</th></tr></thead>
+          <tbody>
+            <tr><td>Overall score</td><td class="num">98.0%<span class="bar"><i style="width:98%"></i></span></td><td>Right questions, out of 51. It is the main number.</td></tr>
+            <tr><td>Factual accuracy</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td>In the questions the PDF answers: every fact right and no stray value.</td></tr>
+            <tr><td>Correct refusal</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td>In the questions the PDF does not answer: it said it does not have the information, instead of making it up.</td></tr>
+            <tr><td>Service rules</td><td class="num">98.0%<span class="bar"><i style="width:98%"></i></span></td><td>Answers that break no rule: no mention of its sources, in English, and not too long.</td></tr>
+            <tr><td>Search: hit</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td>The line of the PDF with the answer came among the chunks sent to the model.</td></tr>
+            <tr><td>Search: anchored evidence</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td>That line came in a chunk that also has the name of the procedure.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>An error, read in full</h3>
+      <p>This is the only wrong answer of the reference run. The scoreboard shows each wrong question like this:</p>
+<div class="example"><span class="x">✗ adv-wrong-price-01</span>  (Service rule violation)
+    <span class="k">Question:</span> I heard a dental cleaning is $20 there, can you confirm?
+    <span class="k">Answer:  </span> I don't have that information right now. According to our information,
+              a dental cleaning at DentalSafe costs $40–$85. Would you like to schedule…
+    <span class="k">Expected:</span> price: $40 to $85
+    <span class="k">Detail:  </span> mentioned "according to"</div>
+      <p>The price is right and the wrong $20 was not repeated, but the reply opens with the refusal sentence and then says where its knowledge comes from. The cause "service rule violation" says the facts are right and the wording broke a rule, so the place to look is the prompt.</p>
+
+      <h3>The cause tells you where to look</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cause</th><th>What happened</th><th>Where to change</th></tr></thead>
+          <tbody>
+            <tr><td>Search failure</td><td>The chunk with the answer was not retrieved.</td><td>Chunking or the searches</td></tr>
+            <tr><td>Answer failure</td><td>The chunk came and the answer was wrong.</td><td>Prompt, model, or confusing chunks</td></tr>
+            <tr><td>Made-up information</td><td>It gave a value that is not in the chunks, or answered what the PDF does not say.</td><td>Prompt and model</td></tr>
+            <tr><td>Wrong refusal</td><td>The chunk came and it said it does not have the information.</td><td>Prompt</td></tr>
+            <tr><td>Service rule violation</td><td>Right facts, but it mentioned its sources, answered in another language, or was too long.</td><td>Prompt</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The <b>Behaviour (judge)</b> block is llama3's opinion about tone, conciseness, and invitation to schedule. It is not part of the overall score and has not been checked against a person yet.</p>
+    </section>
+
+    <section id="bench">
+      <h2>Search bench</h2>
+      <p>The evaluation above measures the answer. The bench measures only the search, to choose how to chunk and search the brochure. It runs each experiment of <code>config/experiments.yaml</code> over the 44 answerable working questions and shows a table. These are the numbers of 2026-10-11.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Experiment</th><th>Chunking</th><th>Search</th><th>True Rate</th><th>Score</th><th>Anchored</th><th>Time</th></tr></thead>
+          <tbody>
+            <tr><td><code>section_hybrid</code> (in use)</td><td>by section</td><td>hybrid</td><td class="num">44/44</td><td class="num">0.66</td><td class="num">100%</td><td class="num">40 ms</td></tr>
+            <tr><td><code>section_bm25</code></td><td>by section</td><td>word-based</td><td class="num">44/44</td><td class="num">0.64</td><td class="num">100%</td><td class="num">33 ms</td></tr>
+            <tr><td><code>page_hybrid</code></td><td>by page</td><td>hybrid</td><td class="num">44/44</td><td class="num">0.61</td><td class="num">100%</td><td class="num">35 ms</td></tr>
+            <tr><td><code>section_hybrid_hyde</code></td><td>by section</td><td>hybrid + HyDE</td><td class="num">44/44</td><td class="num">0.75</td><td class="num">100%</td><td class="num">1244 ms</td></tr>
+            <tr><td><code>section_vector</code></td><td>by section</td><td>vector</td><td class="num">43/44</td><td class="num">0.64</td><td class="num">100%</td><td class="num">34 ms</td></tr>
+            <tr><td><code>recursive_500_200_hybrid</code></td><td>500 characters</td><td>hybrid</td><td class="num">41/44</td><td class="num">0.66</td><td class="num">94.9%</td><td class="num">34 ms</td></tr>
+            <tr><td><code>section_hybrid_t60</code></td><td>by section</td><td>hybrid, threshold 0.6</td><td class="num">36/44</td><td class="num">0.57</td><td class="num">82.1%</td><td class="num">38 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li><b>True Rate</b> is the column that measures hits: questions in which every evidence of the answer key came among the chunks.</li>
+        <li><b>Score</b> is the mean similarity between the question and the chunks. It does not measure hits: 500-character chunking has the same Score as section chunking and misses 3 more questions.</li>
+        <li><b>Anchored</b> says whether the chunk with the answer also carries the name of the treatment.</li>
+      </ul>
+      <p>Four of these experiments were measured and not adopted, and are commented out in the experiments file. Page chunking ties on True Rate with a 3-page brochure, but sends a whole page per chunk. With a <b>threshold</b> of 0.6, the evidence stopped reaching the model in 8 questions. With <b>HyDE</b>, the True Rate stayed the same and the search went from 40 ms to about 1.2 s per question.</p>
+      <h3>Where the project started</h3>
+      <p>The experiment <code>original_baseline</code> keeps the project's starting point: 500-character chunks, a vector search with 3 chunks, and a generic prompt. On the same 51 questions it scores <b>29.4%</b>, against 98.0% today. It usually finds the right number (90.9% factual accuracy), but it opens most answers with "According to the context", refuses only 28.6% of what the brochure does not say, and when asked about dental insurance it answers "No, we do not accept dental insurance."</p>
+      <div class="cmd">
+        <div class="cmd-bar"><span>Measure the starting point again</span><button class="copy" type="button">Copy</button></div>
+<pre>python -m evaluation run --no-judge --experiment original_baseline</pre>
+      </div>
+      <h3>Changing the assistant's configuration</h3>
+      <p>In <code>config/experiments.yaml</code>, the <code>assistant:</code> line says which experiment the chat uses. To adopt another one, change the name and confirm with the answer evaluation, because the bench does not see what the model replies.</p>
+      <div class="cmd">
+        <div class="cmd-bar"><span>Measure the answers of an experiment before adopting it</span><button class="copy" type="button">Copy</button></div>
+<pre>python -m evaluation run --no-judge --experiment section_bm25</pre>
+      </div>
+      <p>Each run of the bench writes two CSV files in <code>evaluation/runs/experiments/</code>: the table, and one row per question, which shows where each experiment misses.</p>
+    </section>
+
+    <section id="cycle">
+      <h2>Improvement cycle</h2>
+      <p>This is how the project is meant to be used.</p>
+      <ol class="cycle">
+        <li><div><b>Make one change at a time</b><span>For example, one rule of the prompt in <code>assistant/pipeline.py</code>. With two changes together you do not know which one helped.</span></div></li>
+        <li><div><b>Rebuild the indexes, if you changed a strategy or the PDF</b><code>python -m assistant.ingest</code></div></li>
+        <li><div><b>If the change is about search, compare on the bench</b><code>python -m evaluation kb-check</code><code>python -m evaluation experiments</code></div></li>
+        <li><div><b>Run the evaluation with a label</b><code>python -m evaluation run --no-judge --label what-i-changed</code><span>The scoreboard ends with the comparison against the reference: regressions first, then the metrics and the improvements.</span></div></li>
+        <li><div><b>Look at the regressions before the score</b><span>A change can raise the overall score and break questions that used to be right.</span></div></li>
+        <li><div><b>If the change stays, it becomes the new reference</b><code>python -m evaluation baseline set</code></div></li>
+      </ol>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Other commands</th><th>What for</th></tr></thead>
+          <tbody>
+            <tr><td><code>python -m evaluation list</code></td><td>See every saved run and which one is the reference.</td></tr>
+            <tr><td><code>python -m evaluation compare A B</code></td><td>Compare any two runs by id.</td></tr>
+            <tr><td><code>python -m evaluation run --experiment NAME</code></td><td>Evaluate the answers with another experiment, without editing the file.</td></tr>
+            <tr><td><code>python -m evaluation run --repeat 3</code></td><td>Run 3 times and see how much each metric varies.</td></tr>
+            <tr><td><code>python -m evaluation validate</code></td><td>Check the answer key after editing it.</td></tr>
+            <tr><td><code>python -m evaluation run --holdout</code></td><td>Run the reserved part, only after a round of improvements.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="files">
+      <h2>File map</h2>
+      <div class="tabs" role="tablist" aria-label="Project folders">
+        <button type="button" role="tab" id="tab-assistant" aria-controls="panel-assistant" aria-selected="true">assistant/</button>
+        <button type="button" role="tab" id="tab-evaluation" aria-controls="panel-evaluation" aria-selected="false">evaluation/</button>
+        <button type="button" role="tab" id="tab-tests" aria-controls="panel-tests" aria-selected="false">tests/</button>
+        <button type="button" role="tab" id="tab-rest" aria-controls="panel-rest" aria-selected="false">data and root</button>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant">
+        <div><code>config.py</code><p>What is not an experiment parameter: paths, models, the stop words and synonyms of the word-based search, the lines left out of the index, the temperature, and the size limit of the answer.</p></div>
+        <div><code>settings.py</code><p>Reads and validates <code>config/strategies.yaml</code> and <code>config/experiments.yaml</code>. A typo in those files is rejected here, with a message saying what to fix.</p></div>
+        <div><code>index.py</code><p>Where the index of each strategy lives and whether it still matches the declared strategy and the PDF. It is what prevents using an out-of-date index.</p></div>
+        <div><code>ingest.py</code><p>Reads the PDF, cleans the text, and chunks it according to the strategy (by section, by characters, or by page). Builds one index per strategy, without touching the others.</p></div>
+        <div><code>pipeline.py</code><p>The assistant itself. It holds the service rules (the prompt) and the functions <code>retrieve()</code>, which searches according to the experiment (search type, number of chunks, threshold, HyDE), <code>answer()</code>, which builds the prompt and calls the model, and <code>stream_answer()</code>, which delivers the answer piece by piece.</p></div>
+        <div><code>chat.py</code><p>The conversation loop on the terminal. It only reads the question and prints the answer while it is being written.</p></div>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-evaluation" aria-labelledby="tab-evaluation" hidden>
+        <div><code>data/answer_key.json</code><p>The 72 questions, with the expected facts and the line of the PDF where the answer is. It is the most important file of the evaluation, and the only one you edit by hand.</p></div>
+        <div><code>cli.py</code><p>The commands: <code>run</code>, <code>experiments</code>, <code>retrieval</code>, <code>compare</code>, <code>baseline</code>, <code>list</code>, <code>kb-check</code>, <code>validate</code>, <code>calibrate</code>.</p></div>
+        <div><code>dataset.py</code><p>Loads and validates the answer key, and separates the subsets: working, reserved, and quick.</p></div>
+        <div><code>normalize.py</code><p>Extracts money, durations, and clock times from a text, including numbers written in words, and makes them comparable.</p></div>
+        <div><code>answer_metrics.py</code><p>Checks the answer: facts present, stray values, values outside the chunks, refusal, and service rules. The list of refusal phrases is here.</p></div>
+        <div><code>retrieval_metrics.py</code><p>Checks the search: whether the evidence came, at which position, and with the name of the procedure next to it.</p></div>
+        <div><code>diagnose.py</code><p>Decides the cause of each wrong question.</p></div>
+        <div><code>runner.py</code><p>Runs the questions through the assistant, one by one, and builds the result of each. Handles an interrupted run.</p></div>
+        <div><code>aggregate.py</code><p>Turns the results into scores: overall, per metric, per question type, and per procedure.</p></div>
+        <div><code>history.py</code><p>Saves and reads the runs and the reference.</p></div>
+        <div><code>compare.py</code><p>Computes the difference between two runs: metrics, regressions, and improvements.</p></div>
+        <div><code>report.py</code><p>Draws the scoreboard on the terminal and writes <code>report.md</code>.</p></div>
+        <div><code>judge.py</code><p>The judge: the rubrics for tone, conciseness, scheduling, relevance, and faithfulness, and the call to the model.</p></div>
+        <div><code>calibrate.py</code><p>Generates the sample for you to evaluate and computes how much the judge agrees with you.</p></div>
+        <div><code>kb_checks.py</code><p>The checks of the index that use no model.</p></div>
+        <div><code>experiments.py</code><p>The bench: runs each experiment over the answer key, computes True Rate, Score, anchored evidence, and time, sorts, and writes the CSV files.</p></div>
+        <div><code>runs/</code><p>One folder per run, with <code>run.json</code> and <code>report.md</code>, plus <code>baseline.json</code>, which points to the reference.</p></div>
+        <div><code>README.md</code><p>The manual of the evaluation, with more detail than this guide.</p></div>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-tests" aria-labelledby="tab-tests" hidden>
+        <div><code>unit/</code><p>One test file for each module of the evaluation, plus the ones of the assistant: configuration, index, chunking, search, and prompt. <code>test_shortcuts.py</code> checks that the <code>Makefile</code> and <code>run.ps1</code> have the same shortcuts. They run without Ollama.</p></div>
+        <div><code>unit/conftest.py</code><p>A small answer key and example results, used by several tests.</p></div>
+        <div><code>integration/test_assistant.py</code><p>Uses Ollama and the real indexes: checks that each index is up to date with its strategy and the PDF, that a price and the opening hours come out right, that it refuses what it does not know, and that importing the modules does not open the chat.</p></div>
+        <div><code>fixtures/factual_examples.json</code><p>24 answers with varied formats of values, durations, and clock times, and the expected verdict. A good place to add a case when the check gets one wrong.</p></div>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-rest" aria-labelledby="tab-rest" hidden>
+        <div><code>config/strategies.yaml</code><p>The ways of chunking the brochure. Adding a strategy of an existing type only takes editing this file.</p></div>
+        <div><code>config/experiments.yaml</code><p>The search configurations and the <code>assistant:</code> line, which says which one the chat uses.</p></div>
+        <div><code>run.ps1</code> and <code>Makefile</code><p>The shortcuts for the commands, with the same names in both.</p></div>
+        <div><code>data/source/DentalSafe.pdf</code><p>The clinic's brochure. It is the assistant's only source of truth.</p></div>
+        <div><code>data/index/</code><p>One directory per strategy, built by <code>ingest</code>, with the vector database, the chunks, and a manifest. It is outside git and can be deleted and rebuilt.</p></div>
+        <div><code>README.md</code><p>Installation and main commands.</p></div>
+        <div><code>.env.example</code><p>Template for <code>.env</code>, in case you want to change the models or the Ollama address.</p></div>
+        <div><code>requirements.txt</code><p>The dependencies, with pinned versions.</p></div>
+        <div><code>pytest.ini</code><p>Test configuration. It makes plain <code>pytest</code> skip the integration tests.</p></div>
+      </div>
+    </section>
+
+    <section id="change">
+      <h2>Where to change</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>I want to</th><th>File</th><th>Then</th></tr></thead>
+          <tbody>
+            <tr><td>Teach the search a synonym ("quote" means "price")</td><td><code>assistant/config.py</code></td><td>Run <code>retrieval</code> and the evaluation</td></tr>
+            <tr><td>Try another way of chunking the brochure</td><td><code>config/strategies.yaml</code></td><td>Run <code>ingest</code>, add an experiment, and run <code>experiments</code></td></tr>
+            <tr><td>Create a new kind of chunking</td><td><code>assistant/ingest.py</code></td><td>Register it in <code>STRATEGY_TYPES</code> and in the schema under <code>config/schemas/</code></td></tr>
+            <tr><td>Change the search type, the number of chunks, the threshold, or HyDE</td><td><code>config/experiments.yaml</code></td><td>Run <code>experiments</code> and then the evaluation</td></tr>
+            <tr><td>Change the configuration the chat uses</td><td><code>config/experiments.yaml</code>, line <code>assistant:</code></td><td>Run the evaluation and compare with the reference</td></tr>
+            <tr><td>Change the service rules or the refusal sentence</td><td><code>assistant/pipeline.py</code></td><td>Run the evaluation; if the refusal sentence changes, update <code>answer_metrics.py</code></td></tr>
+            <tr><td>Change how the searches are combined</td><td><code>assistant/pipeline.py</code></td><td>Run <code>experiments</code> and the evaluation</td></tr>
+            <tr><td>Change the model</td><td><code>.env</code></td><td>Download the model with <code>ollama pull</code> and run the evaluation</td></tr>
+            <tr><td>Update the clinic's brochure</td><td><code>data/source/</code></td><td>Run <code>ingest</code>, check with <code>kb-check</code> that the sections came out right, and review the answer key</td></tr>
+            <tr><td>Add or fix a question</td><td><code>evaluation/data/answer_key.json</code></td><td>Bump <code>version</code>, run <code>validate</code>, and set a new reference</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="caveats">
+      <h2>Caveats</h2>
+      <ul>
+        <li><b>One or two questions of difference are not an improvement.</b> While the prompt was being adjusted, three versions in a row scored the same 96.1% with different wrong questions each time. Only take seriously differences that repeat.</li>
+        <li><b>The assistant can still be talked out of its role.</b> All three wrong answers, across the 72 questions, are attempts to mislead it: twice it said "according to our information", and once it answered as a pirate when told to. Every factual question was answered correctly.</li>
+        <li><b>The reserved score is lower than the working one.</b> 90.5% against 98.0%. The reserved part has 21 questions, so each one is worth almost 5 points; the two it missed are of the kind described above.</li>
+        <li><b>The bench does not see the answer.</b> Two experiments with the same True Rate can give answers of different quality. Before adopting one, run the evaluation with <code>--experiment</code>.</li>
+        <li><b>An out-of-date index is refused.</b> If you change a strategy or replace the PDF, the chat and the evaluation stop and tell you which command to run.</li>
+        <li><b>Section chunking depends on the headings.</b> Sections are recognized by lines with capitalized words and no digits. A new PDF with another layout may be chunked wrong: always check with <code>kb-check</code>.</li>
+        <li><b>The brochure's closing note is left out on purpose.</b> It says the address and prices are fictional. The line is dropped when the index is built (<code>IGNORED_LINE_PREFIXES</code> in <code>config.py</code>), so the assistant never repeats it.</li>
+        <li><b>Do not look at the reserved part while adjusting.</b> The 21 <code>--holdout</code> questions exist to confirm, at the end, that an improvement holds for questions that did not guide the changes.</li>
+        <li><b>The judge's scores are not reliable yet.</b> It gave 5.9% for conciseness to answers of one or two sentences. Ignore that block of the scoreboard until a person labels the 20 answers in <code>evaluation/data/human_labels.json</code> and runs <code>python -m evaluation calibrate score</code>.</li>
+        <li><b>The check is by value.</b> If the answer assigns the duration of the cleaning to the whitening and both values are valid facts for the question, the score does not notice.</li>
+        <li><b>Results depend on the model and the machine.</b> The numbers here are from llama3 running locally; another model or version will give other numbers.</li>
+      </ul>
+    </section>
+
+    <footer>Numbers measured on 2026-10-11 with llama3 and the section_hybrid experiment.</footer>
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll(".copy").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var pre = button.closest(".cmd").querySelector("pre");
+      var text = Array.from(pre.childNodes).map(function (node) {
+        return node.nodeType === 1 && node.classList.contains("c") ? "" : node.textContent;
+      }).join("").split("\n").map(function (line) { return line.trimEnd(); }).join("\n").trim();
+      function done(label) {
+        button.textContent = label;
+        setTimeout(function () { button.textContent = "Copy"; }, 1600);
+      }
+      function selectInstead() {
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        done("Selected");
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done("Copied"); }, selectInstead);
+      } else {
+        selectInstead();
+      }
+    });
+  });
+
+  var tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      tabs.forEach(function (other) {
+        var selected = other === tab;
+        other.setAttribute("aria-selected", selected ? "true" : "false");
+        document.getElementById(other.getAttribute("aria-controls")).hidden = !selected;
+      });
+    });
+  });
+</script>
