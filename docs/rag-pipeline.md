@@ -102,8 +102,8 @@ python -m assistant.ingest                 # section: 11 chunks
 python -m evaluation kb-check              # 0 duplicates, 0 unanchored facts, 0 corrupted chunks
 python -m evaluation validate              # valid configuration and answer key
 python -m evaluation experiments           # section_hybrid 44/44
-python -m evaluation run --no-judge        # 98.0% of 51, compared with the reference
-python -m evaluation run --no-judge --experiment original_baseline   # 29.4% of 51
+python -m evaluation run --no-judge        # 96.1% of 51, compared with the reference
+python -m evaluation run --no-judge --experiment original_baseline   # 15.7% of 51
 ```
 
 The numbers are those of the stored runs in `evaluation/runs/`; a different model version can move them by a question or two.
