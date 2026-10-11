@@ -163,10 +163,10 @@
       <p class="lede">An assistant that answers customer questions for a dental clinic from a 3-page PDF, and an evaluation that measures whether it is answering correctly.</p>
       <p>The project has two halves. The <b>assistant</b> searches the clinic's brochure for the chunks closest to the question and asks a local model to answer using only them. The <b>evaluation</b> asks 72 questions with a known answer, checks each reply, and stores the result, so you know whether a change made the assistant better or worse. The clinic, DentalSafe, is fictional.</p>
       <div class="facts">
-        <div><b>98.0%</b><span>overall score on the 51 working questions</span></div>
+        <div><b>96.1%</b><span>overall score on the 51 working questions</span></div>
         <div><b>90.5%</b><span>on the 21 reserved questions, not used for tuning</span></div>
         <div><b>44/44</b><span>questions in which the search brings the right evidence</span></div>
-        <div><b>0.6 s</b><span>typical time of one answer</span></div>
+        <div><b>0.7 s</b><span>typical time of one answer</span></div>
       </div>
       <p>Everything runs on your computer, with Ollama. Nothing is sent to external services.</p>
     </section>
@@ -280,13 +280,13 @@ python -m assistant.ingest      <span class="c"># builds the indexes in data/ind
 
     <section id="scoreboard">
       <h2>Reading the scoreboard</h2>
-      <p>Each run shows the scoreboard on the terminal and writes the same content, with every question, to <code>evaluation/runs/&lt;id&gt;/report.md</code>. These are the numbers of the current reference, run <code>20261011-132450-reference</code>.</p>
+      <p>Each run shows the scoreboard on the terminal and writes the same content, with every question, to <code>evaluation/runs/&lt;id&gt;/report.md</code>. These are the numbers of the current reference, run <code>20261011-191541</code>.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Metric</th><th>Score</th><th>What it measures</th></tr></thead>
           <tbody>
-            <tr><td>Overall score</td><td class="num">98.0%<span class="bar"><i style="width:98%"></i></span></td><td>Right questions, out of 51. It is the main number.</td></tr>
-            <tr><td>Factual accuracy</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td>In the questions the PDF answers: every fact right and no stray value.</td></tr>
+            <tr><td>Overall score</td><td class="num">96.1%<span class="bar"><i style="width:96.1%"></i></span></td><td>Right questions, out of 51. It is the main number.</td></tr>
+            <tr><td>Factual accuracy</td><td class="num">97.7%<span class="bar"><i style="width:97.7%"></i></span></td><td>In the questions the PDF answers: every fact right and no stray value.</td></tr>
             <tr><td>Correct refusal</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td>In the questions the PDF does not answer: it said it does not have the information, instead of making it up.</td></tr>
             <tr><td>Service rules</td><td class="num">98.0%<span class="bar"><i style="width:98%"></i></span></td><td>Answers that break no rule: no mention of its sources, in English, and not too long.</td></tr>
             <tr><td>Search: hit</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td>The line of the PDF with the answer came among the chunks sent to the model.</td></tr>
@@ -345,7 +345,7 @@ python -m assistant.ingest      <span class="c"># builds the indexes in data/ind
       </ul>
       <p>Four of these experiments were measured and not adopted, and are commented out in the experiments file. Page chunking ties on True Rate with a 3-page brochure, but sends a whole page per chunk. With a <b>threshold</b> of 0.6, the evidence stopped reaching the model in 8 questions. With <b>HyDE</b>, the True Rate stayed the same and the search went from 40 ms to about 1.2 s per question.</p>
       <h3>Where the project started</h3>
-      <p>The experiment <code>original_baseline</code> keeps the project's starting point: 500-character chunks, a vector search with 3 chunks, and a generic prompt. On the same 51 questions it scores <b>29.4%</b>, against 98.0% today. It usually finds the right number (90.9% factual accuracy), but it opens most answers with "According to the context", refuses only 28.6% of what the brochure does not say, and when asked about dental insurance it answers "No, we do not accept dental insurance."</p>
+      <p>The experiment <code>original_baseline</code> keeps the project's starting point: 500-character chunks, a vector search with 3 chunks above a 0.7 threshold, and a generic prompt. On the same 51 questions it scores <b>15.7%</b>, against 96.1% today. Its search brings the evidence in only 26 of 44 questions, it opens most answers with "According to the context", refuses only 14.3% of what the brochure does not say, and when asked about dental insurance it answers "Yes, we accept dental insurance."</p>
       <div class="cmd">
         <div class="cmd-bar"><span>Measure the starting point again</span><button class="copy" type="button">Copy</button></div>
 <pre>python -m evaluation run --no-judge --experiment original_baseline</pre>
@@ -469,8 +469,8 @@ python -m assistant.ingest      <span class="c"># builds the indexes in data/ind
       <h2>Caveats</h2>
       <ul>
         <li><b>One or two questions of difference are not an improvement.</b> While the prompt was being adjusted, three versions in a row scored the same 96.1% with different wrong questions each time. Only take seriously differences that repeat.</li>
-        <li><b>The assistant can still be talked out of its role.</b> All three wrong answers, across the 72 questions, are attempts to mislead it: twice it said "according to our information", and once it answered as a pirate when told to. Every factual question was answered correctly.</li>
-        <li><b>The reserved score is lower than the working one.</b> 90.5% against 98.0%. The reserved part has 21 questions, so each one is worth almost 5 points; the two it missed are of the kind described above.</li>
+        <li><b>The assistant can still be talked out of its role.</b> All four wrong answers, across the 72 questions, are attempts to mislead it: twice it said "according to our information", once it answered as a pirate when told to, and once it calculated a 24-month total that the brochure does not give. Every other type of question was answered correctly.</li>
+        <li><b>The reserved score is lower than the working one.</b> 90.5% against 96.1%. The reserved part has 21 questions, so each one is worth almost 5 points; the two it missed are of the kind described above.</li>
         <li><b>The bench does not see the answer.</b> Two experiments with the same True Rate can give answers of different quality. Before adopting one, run the evaluation with <code>--experiment</code>.</li>
         <li><b>An out-of-date index is refused.</b> If you change a strategy or replace the PDF, the chat and the evaluation stop and tell you which command to run.</li>
         <li><b>Section chunking depends on the headings.</b> Sections are recognized by lines with capitalized words and no digits. A new PDF with another layout may be chunked wrong: always check with <code>kb-check</code>.</li>

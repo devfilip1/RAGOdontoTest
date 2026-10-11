@@ -35,7 +35,7 @@ flowchart LR
 - The assistant answers only from the brochure; when the brochure has no answer, it replies with one fixed sentence.
 - The chat and the evaluation call the same two functions, `retrieve()` and `answer()`, so what is measured is what the customer gets.
 - An answer is scored without a model: values are extracted from the text and compared with the answer key.
-- Current results: 98.0% on 51 working questions, 90.5% on 21 reserved ones, against 29.4% for the project's starting point. See the [root README](../README.md#results).
+- Current results: 96.1% on 51 working questions, 90.5% on 21 reserved ones, against 15.7% for the project's starting point. See the [root README](../README.md#results).
 - Everything runs locally. No data leaves the machine and no API key is needed.
 
 ## Open questions
@@ -47,4 +47,4 @@ flowchart LR
 - [ ] Is RagLab meant to stay a single-example project, or to be split into a generic core plus examples? The code is specific to DentalSafe today (see [risks](architecture.md#risks-and-technical-debt)).
 
 ---
-Last updated: 2026-10-11 (ef3d396)
+Last updated: 2026-10-11 (3bb132c)

@@ -45,14 +45,14 @@ Measured on 2026-10-11 with `llama3`, `nomic-embed-text`, and the `section_hybri
 
 | Run | Subset | Overall score | Typical answer time |
 |---|---|---|---|
-| `20261011-132450-reference` | dev, 51 questions | 98.0% (50 of 51) | 0.6 s |
+| `20261011-191541` | dev, 51 questions | 96.1% (49 of 51) | 0.7 s |
 | `20261011-132527-reference-holdout` | reserved part, 21 questions | 90.5% (19 of 21) | 0.7 s |
 
-| `20261011-140604-original-baseline` | dev, with the `original_baseline` experiment | 29.4% (15 of 51) | 0.6 s |
+| `20261011-191050` | dev, with the `original_baseline` experiment | 15.7% (8 of 51) | 0.6 s |
 
-The last row is where the project started (500-character chunks, vector search with 3 chunks, generic prompt), measured on the same questions. Its factual accuracy is 90.9%, but it refuses only 28.6% of what the brochure does not answer and breaks a service rule in two thirds of the answers, mostly by opening with "According to the context".
+The last row is where the project started (500-character chunks, vector search with 3 chunks above a 0.7 threshold, generic prompt), measured on the same questions. Its 43 wrong answers split into 20 service rule violations, mostly by opening with "According to the context", 13 search failures, 8 made-up answers, and 2 answer failures. Its factual accuracy is 65.9% and it refuses only 14.3% of what the brochure does not answer. In the search bench it brings the evidence in 26 of 44 questions (round `20261011-193354`). The earlier run `20261011-140604-original-baseline` measured the same experiment with the threshold off: 29.4%, with the evidence in 41 of 44 questions.
 
-The three wrong answers of the two reference runs are all attempts to break the assistant's role: it repeated "according to our information" twice, and once it played along with a request to answer as a pirate. Every factual question was answered correctly in both subsets.
+The four wrong answers of the two reference runs are all attempts to break the assistant's role: it repeated "according to our information" twice, once it played along with a request to answer as a pirate, and once it calculated a 24-month total that the brochure does not give. Every other type of question was answered correctly in both subsets. The reserved part was not run again for this reference; its run has the same prompt and index.
 
 ## How to read the scoreboard
 

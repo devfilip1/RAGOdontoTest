@@ -137,7 +137,7 @@ See [decisions/](decisions/README.md).
 
 ## Risks and technical debt
 
-- **The model can be talked out of its role.** All three wrong answers across the 72 questions are of this kind (stating its source twice, answering as a pirate once). A prompt cannot guarantee behaviour; a check on the output could.
+- **The model can be talked out of its role.** All four wrong answers across the 72 questions are of this kind (stating its source twice, answering as a pirate once, calculating a total the brochure does not give once). A prompt cannot guarantee behaviour; a check on the output could.
 - **Results are sensitive to small prompt changes.** Three prompt versions in a row scored the same 96.1% with different wrong questions. One or two questions of difference are noise.
 - **Section detection is a heuristic.** `is_heading` in [ingest.py](../assistant/ingest.py) recognizes headings by capitalized words and no digits or colon. A brochure with another layout can be chunked wrong without any error; `kb-check` is the safety net.
 - **The search vocabulary is hand-written for this brochure.** `STOPWORDS` and `QUERY_SYNONYMS` in [config.py](../assistant/config.py) were tuned on the working questions. The reserved questions guard against overfitting, but there are only 21 of them.
