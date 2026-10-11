@@ -1,0 +1,25 @@
+# Estratégias de divisão do material da clínica.
+# Cada estratégia gera o seu próprio índice em data/index/<name>/.
+# Depois de editar este arquivo, recrie os índices: python -m assistant.ingest
+#
+# Tipos disponíveis:
+#   section  um trecho por seção do documento (um tratamento por trecho)
+#            parameters opcionais: max_chars (padrão 1200), overlap (padrão 100)
+#   split    divisão por caracteres
+#            parameters obrigatórios: chunk_size, chunk_overlap
+#   page     um trecho por página, sem parâmetros
+
+strategies:
+  # A divisão em uso no assistente: cada valor fica junto do nome do tratamento.
+  - name: section
+    type: section
+
+  # A divisão original do projeto.
+  - name: recursive_500_200
+    type: split
+    parameters:
+      chunk_size: 500
+      chunk_overlap: 200
+
+  - name: page
+    type: page
