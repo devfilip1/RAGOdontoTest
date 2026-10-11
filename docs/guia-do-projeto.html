@@ -1,0 +1,518 @@
+<title>Guia do RAG OdontoTest</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: índice fixo à esquerda, texto em coluna de leitura à direita; no celular tudo em uma coluna. */
+  :root {
+    --bg: #f2f5f5;
+    --surface: #ffffff;
+    --sunken: #e6ecec;
+    --ink: #13292d;
+    --muted: #54696d;
+    --line: #cfd9da;
+    --accent: #0a6c78;
+    --accent-soft: #d8ecee;
+    --good: #1c7a4c;
+    --warn: #9a5b00;
+    --warn-soft: #f6ead3;
+    --bad: #b03a2e;
+    --bad-soft: #f6dedb;
+    --code-bg: #10262a;
+    --code-ink: #dcebed;
+    --code-muted: #8fa9ad;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1b1e; --surface: #142629; --sunken: #1b3135; --ink: #e3eeef; --muted: #96adb1;
+      --line: #2a4449; --accent: #5cc4d1; --accent-soft: #173a40; --good: #63c794; --warn: #e0b060;
+      --warn-soft: #3a2f17; --bad: #ee8f84; --bad-soft: #40211e; --code-bg: #091416; --code-ink: #dcebed;
+      --code-muted: #7f999d; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1b1e; --surface: #142629; --sunken: #1b3135; --ink: #e3eeef; --muted: #96adb1;
+    --line: #2a4449; --accent: #5cc4d1; --accent-soft: #173a40; --good: #63c794; --warn: #e0b060;
+    --warn-soft: #3a2f17; --bad: #ee8f84; --bad-soft: #40211e; --code-bg: #091416; --code-ink: #dcebed;
+    --code-muted: #7f999d; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+  .page { max-width: 1120px; margin-inline: auto; padding-inline: 20px; padding-block: 40px 80px;
+          display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 48px; }
+  main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+  section { display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 24px; }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+  h1 { font-size: clamp(2rem, 5vw, 2.9rem); font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 1.1rem; font-weight: 500; }
+  p, ul, ol { margin: 0; max-width: 68ch; }
+  ul, ol { padding-left: 1.25rem; display: flex; flex-direction: column; gap: 6px; }
+  a { color: var(--accent); }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--sunken); padding: 1px 5px; border-radius: 4px; }
+  .lede { font-size: 1.12rem; color: var(--muted); }
+  .eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+
+  nav { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start;
+        display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
+  nav .eyebrow { margin-bottom: 8px; }
+  nav a { color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; }
+  nav a:hover, nav a:focus-visible { color: var(--ink); background: var(--sunken); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px;
+           background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .facts div { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+  .facts b { font-family: var(--display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .facts span { font-size: 0.85rem; color: var(--muted); }
+
+  .cmd { background: var(--code-bg); color: var(--code-ink); border-radius: 10px; overflow: hidden; }
+  .cmd pre { margin: 0; padding: 16px 18px; overflow-x: auto; font-family: var(--mono); font-size: 0.86rem; line-height: 1.7; }
+  .cmd .c { color: var(--code-muted); }
+  .cmd-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 8px 6px 18px;
+             border-bottom: 1px solid #ffffff1f; font-family: var(--mono); font-size: 0.72rem; color: var(--code-muted);
+             letter-spacing: 0.06em; text-transform: uppercase; }
+  .copy { font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--code-ink); background: #ffffff14;
+          border: 1px solid #ffffff2b; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .copy:hover { background: #ffffff26; }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+  .step { flex: 1 1 130px; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+          padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .step b { font-family: var(--display); font-weight: 500; }
+  .step span { font-size: 0.84rem; color: var(--muted); }
+  .step code { align-self: flex-start; }
+  .step.model { background: var(--accent-soft); border-color: var(--accent); }
+  .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; flex: 0 0 auto; }
+  .split { flex: 1 1 150px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .split .step { flex: 1 1 auto; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted);
+       font-weight: 500; background: var(--sunken); white-space: nowrap; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+  td code { white-space: nowrap; }
+  .bar { display: block; height: 6px; width: 110px; background: var(--sunken); border-radius: 3px; margin-top: 6px; }
+  .bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+  .bar.low i { background: var(--bad); }
+
+  .note { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; max-width: 72ch; }
+  .note b { color: var(--warn); }
+
+  .example { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px;
+             font-family: var(--mono); font-size: 0.85rem; line-height: 1.75; overflow-x: auto; white-space: pre; }
+  .example .x { color: var(--bad); font-weight: 500; }
+  .example .k { color: var(--muted); }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tabs button { font: inherit; font-size: 0.9rem; color: var(--muted); background: transparent; border: 1px solid var(--line);
+                 border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .tabs button[aria-selected="true"] { color: var(--surface); background: var(--accent); border-color: var(--accent); }
+  .files { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; }
+  .files > div { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .files > div:last-child { border-bottom: 0; }
+  .files code { background: none; padding: 0; color: var(--accent); font-weight: 500; overflow-wrap: anywhere; }
+  .files p { font-size: 0.93rem; }
+
+  .cycle { counter-reset: step; list-style: none; padding: 0; gap: 12px; max-width: none; }
+  .cycle li { counter-increment: step; display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 14px; align-items: start; }
+  .cycle li::before { content: counter(step); font-family: var(--display); font-weight: 700; width: 32px; height: 32px; border-radius: 50%;
+                      background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+  .cycle li > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .cycle code { align-self: flex-start; }
+
+  footer { color: var(--muted); font-size: 0.85rem; }
+
+  @media (max-width: 860px) {
+    .page { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 24px 56px; }
+    nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+    nav .eyebrow { flex-basis: 100%; margin-bottom: 2px; }
+    nav a { background: var(--sunken); }
+    .files > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .flow { flex-direction: column; }
+    .step, .split { flex: 0 0 auto; }
+    .arrow { transform: rotate(90deg); }
+  }
+</style>
+
+<div class="page">
+  <nav aria-label="Nesta página">
+    <span class="eyebrow">Nesta página</span>
+    <a href="#visao">Visão geral</a>
+    <a href="#funciona">Como funciona</a>
+    <a href="#preparar">Preparar o ambiente</a>
+    <a href="#usar">Usar o assistente</a>
+    <a href="#testar">Como testar</a>
+    <a href="#placar">Ler o placar</a>
+    <a href="#bancada">Bancada de busca</a>
+    <a href="#ciclo">Ciclo de melhoria</a>
+    <a href="#arquivos">Mapa de arquivos</a>
+    <a href="#mexer">Onde mexer</a>
+    <a href="#cuidados">Cuidados</a>
+  </nav>
+
+  <main>
+    <section id="visao">
+      <span class="eyebrow">Guia do projeto</span>
+      <h1>RAG OdontoTest</h1>
+      <p class="lede">Um assistente que responde perguntas de clientes da clínica com base em um PDF de 3 páginas, e uma avaliação que mede se ele está respondendo certo.</p>
+      <p>O projeto tem duas metades. O <b>assistente</b> busca no material da clínica os trechos mais parecidos com a pergunta e pede a um modelo local que responda só com eles. A <b>avaliação</b> faz 60 perguntas com resposta conhecida, confere cada resposta e guarda o resultado, para você saber se uma mudança melhorou ou piorou o assistente.</p>
+      <div class="facts">
+        <div><b>97,8%</b><span>nota geral hoje; era 54,3% antes das melhorias</span></div>
+        <div><b>60</b><span>perguntas no gabarito: 46 de trabalho e 14 reservadas</span></div>
+        <div><b>37/38</b><span>perguntas em que a busca traz a evidência certa</span></div>
+        <div><b>1,0 s</b><span>tempo típico de uma resposta; era 2,1 s</span></div>
+      </div>
+      <p>Tudo roda no seu computador, com o Ollama. Nada é enviado para serviços externos.</p>
+    </section>
+
+    <section id="funciona">
+      <h2>Como funciona</h2>
+      <h3>1. Preparação do material, uma vez</h3>
+      <p>O PDF é lido e dividido conforme uma <b>estratégia</b> declarada em <code>config/strategies.yaml</code>. A estratégia em uso é a divisão por seção: cada tratamento vira um trecho que começa com o próprio nome e traz junto o preço, o tempo e o resultado dele. Cada estratégia gera o seu índice em <code>data/index/&lt;nome&gt;/</code>, e os trechos são guardados de duas formas: como vetores, para a busca por significado, e como texto, para a busca por palavras.</p>
+      <div class="flow">
+        <div class="step"><b>PDF da clínica</b><span>8 procedimentos e os diferenciais</span><code>data/source</code></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Divisão por seção</b><span>11 trechos: 8 tratamentos, a abertura, os diferenciais e o convite</span><code>ingest.py</code></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="split">
+          <div class="step"><b>Índice vetorial</b><span>Chroma, com o modelo nomic-embed-text</span></div>
+          <div class="step"><b>Arquivo de trechos</b><span>chunks.json, para a busca lexical</span></div>
+        </div>
+      </div>
+
+      <h3>2. A cada pergunta</h3>
+      <p>A busca segue o <b>experimento</b> indicado na linha <code>assistant:</code> de <code>config/experiments.yaml</code>. Hoje é o <code>section_hybrid</code>: duas buscas rodam sobre os mesmos trechos e cada uma contribui com os seus 2 melhores. Sem os repetidos, de 2 a 4 trechos entram no prompt, ordenados pela posição que tiveram nas duas buscas. A busca por palavras ignora acentos, plural e palavras vazias, e traduz o jeito de falar do cliente para o do material: "custa" também procura "investimento".</p>
+      <div class="flow">
+        <div class="step"><b>Pergunta</b><span>"Quanto custa o clareamento?"</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="split">
+          <div class="step"><b>Busca vetorial</b><span>2 trechos de significado parecido</span></div>
+          <div class="step"><b>Busca lexical (BM25)</b><span>2 trechos com as mesmas palavras</span></div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Junção</b><span>de 2 a 4 trechos, sem repetição</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step model"><b>llama3</b><span>regras fixas, depois os trechos e a pergunta</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Resposta</b></div>
+      </div>
+      <p>As regras de atendimento dizem ao modelo para copiar os valores como estão, usar só o trecho do tratamento perguntado, não fazer contas e, quando a resposta não está no material, responder "Não tenho essa informação no momento." em vez de inventar.</p>
+      <p>Tudo isso está em <code>assistant/pipeline.py</code>, em duas funções: <code>retrieve()</code> faz as buscas e <code>answer()</code> gera a resposta. O chat e a avaliação chamam essas mesmas funções, então a avaliação mede exatamente o assistente que o cliente usa.</p>
+
+      <h3>3. A avaliação</h3>
+      <div class="flow">
+        <div class="step"><b>Gabarito</b><span>pergunta, fatos esperados e a linha do PDF com a resposta</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Assistente</b><span>responde cada pergunta</span></div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="split">
+          <div class="step"><b>Confere a busca</b><span>a linha certa veio nos trechos?</span></div>
+          <div class="step"><b>Confere a resposta</b><span>os valores batem? inventou algo?</span></div>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="step"><b>Placar</b><span>nota, causa de cada erro e comparação com a referência</span></div>
+      </div>
+      <p>A conferência principal não usa modelo. Ela extrai os valores da resposta e compara com o gabarito: "R$ 1.500", "1500 reais" e "mil e quinhentos reais" contam como o mesmo valor.</p>
+    </section>
+
+    <section id="preparar">
+      <h2>Preparar o ambiente</h2>
+      <p>Você já fez isso nesta máquina. Fica aqui para quando precisar refazer ou instalar em outro computador. Requer Python 3.14 e o Ollama aberto.</p>
+      <div class="cmd">
+        <div class="cmd-bar"><span>PowerShell, na raiz do projeto</span><button class="copy" type="button">Copiar</button></div>
+<pre>python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+ollama pull llama3
+ollama pull nomic-embed-text
+
+python -m assistant.ingest      <span class="c"># cria o índice em data/index/</span></pre>
+      </div>
+      <p>Toda vez que abrir um terminal novo, ative o ambiente com <code>.venv\Scripts\Activate.ps1</code>. Sem isso o comando <code>python</code> não é encontrado.</p>
+    </section>
+
+    <section id="usar">
+      <h2>Usar o assistente</h2>
+      <div class="cmd">
+        <div class="cmd-bar"><span>Conversar no terminal</span><button class="copy" type="button">Copiar</button></div>
+<pre>python -m assistant.chat        <span class="c"># digite "sair" para encerrar</span></pre>
+      </div>
+      <h3>Atalhos</h3>
+      <p>Os comandos do dia a dia têm apelidos, que funcionam sem ativar o ambiente virtual. O <code>Makefile</code> tem os mesmos nomes, para quem tiver o <code>make</code> instalado.</p>
+      <div class="cmd">
+        <div class="cmd-bar"><span>PowerShell, na raiz do projeto</span><button class="copy" type="button">Copiar</button></div>
+<pre>.\run.ps1 help                  <span class="c"># lista os 15 atalhos</span>
+.\run.ps1 chat
+.\run.ps1 experiments           <span class="c"># compara as configurações de busca</span>
+.\run.ps1 eval --label o-que-mudei</pre>
+      </div>
+      <p>A resposta aparece enquanto é escrita. O assistente não lembra das perguntas anteriores: cada pergunta é respondida sozinha.</p>
+      <p>Rode <code>python -m assistant.ingest</code> de novo sempre que trocar o PDF ou mudar a divisão. Sem isso o assistente continua respondendo com o índice antigo.</p>
+    </section>
+
+    <section id="testar">
+      <h2>Como testar</h2>
+      <p>Há três tipos de teste, e cada um responde a uma pergunta diferente.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Comando</th><th>Responde</th><th>Tempo</th><th>Precisa do Ollama</th></tr></thead>
+          <tbody>
+            <tr><td><code>pytest</code></td><td>O código está certo? São 308 testes: a configuração, a divisão do PDF, a busca, a bancada, a extração de valores, as métricas e o histórico.</td><td class="num">3 s</td><td>Não</td></tr>
+            <tr><td><code>pytest -m integration</code></td><td>O assistente de verdade funciona? Confere se os índices estão em dia com o PDF e com as estratégias, se ele responde um preço certo e se recusa o que não sabe.</td><td class="num">8 s</td><td>Sim</td></tr>
+            <tr><td><code>python -m evaluation experiments</code></td><td>Qual configuração de busca traz o trecho certo em mais perguntas? Compara todos os experimentos em uma tabela, sem gerar respostas.</td><td class="num">10 s</td><td>Sim</td></tr>
+            <tr><td><code>python -m evaluation retrieval</code></td><td>Em quais perguntas a busca do assistente falha? Detalha um experimento.</td><td class="num">5 s</td><td>Sim</td></tr>
+            <tr><td><code>python -m evaluation kb-check</code></td><td>O índice de uma estratégia está íntegro? Procura trechos duplicados, fatos separados do nome do procedimento e texto corrompido.</td><td class="num">3 s</td><td>Não</td></tr>
+            <tr><td><code>python -m evaluation run --smoke --no-judge</code></td><td>O assistente responde certo? Versão rápida, com 10 perguntas.</td><td class="num">20 s</td><td>Sim</td></tr>
+            <tr><td><code>python -m evaluation run --no-judge</code></td><td>O assistente responde certo? Versão completa, com 46 perguntas.</td><td class="num">1 min</td><td>Sim</td></tr>
+            <tr><td><code>python -m evaluation run</code></td><td>O mesmo, mais as notas de comportamento dadas pelo juiz.</td><td class="num">6 min</td><td>Sim</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>No dia a dia você vai usar quase só a avaliação. O <code>pytest</code> importa quando você mexer no código.</p>
+    </section>
+
+    <section id="placar">
+      <h2>Ler o placar</h2>
+      <p>Cada execução mostra o placar no terminal e grava o mesmo conteúdo, com todas as perguntas, em <code>evaluation/runs/&lt;id&gt;/report.md</code>. Estes são os números da referência atual, ao lado dos de antes das melhorias.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Métrica</th><th>Hoje</th><th>Antes</th><th>O que mede</th></tr></thead>
+          <tbody>
+            <tr><td>Nota geral</td><td class="num">97,8%<span class="bar"><i style="width:97.8%"></i></span></td><td class="num">54,3%</td><td>Perguntas certas, de 46. É o número principal.</td></tr>
+            <tr><td>Correção factual</td><td class="num">97,4%<span class="bar"><i style="width:97.4%"></i></span></td><td class="num">63,2%</td><td>Nas perguntas com resposta no PDF: todos os fatos certos e nenhum valor estranho.</td></tr>
+            <tr><td>Recusa correta</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td class="num">12,5%</td><td>Nas perguntas sem resposta no PDF: ele disse que não tem a informação, em vez de inventar.</td></tr>
+            <tr><td>Fidelidade numérica</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td class="num">93,5%</td><td>Respostas sem nenhum valor que não esteja nos trechos recuperados.</td></tr>
+            <tr><td>Busca: acerto</td><td class="num">97,4%<span class="bar"><i style="width:97.4%"></i></span></td><td class="num">86,8%</td><td>A linha do PDF com a resposta veio entre os trechos enviados ao modelo.</td></tr>
+            <tr><td>Busca: evidência ancorada</td><td class="num">100%<span class="bar"><i style="width:100%"></i></span></td><td class="num">69,7%</td><td>Essa linha veio em um trecho que também tem o nome do procedimento.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Um erro, lido por inteiro</h3>
+      <p>Este é o erro que motivou a avaliação, como aparecia antes das melhorias. O placar mostra cada pergunta errada assim:</p>
+<div class="example"><span class="x">✗ clareamento-preco-01</span>  (Falha de resposta)
+    <span class="k">Pergunta:</span> Quanto custa o clareamento?
+    <span class="k">Resposta:</span> O clareamento dental é um procedimento que custa entre R$ 120 e R$ 250.
+    <span class="k">Esperado:</span> preço: R$ 500 a R$ 1.500
+    <span class="k">Detalhe: </span> faltou: preço; valor inesperado: R$ 120, R$ 250; valor de outro procedimento</div>
+      <p>O valor respondido é o da limpeza. A causa "falha de resposta" diz que o trecho certo foi recuperado e mesmo assim a resposta saiu errada. O motivo estava no índice: havia um trecho que terminava com o preço da limpeza e começava o título "Clareamento Dental". A divisão por seção acabou com isso, e hoje a resposta é "O clareamento dental custa R$ 500 a R$ 1.500."</p>
+
+      <h3>A causa diz onde mexer</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Causa</th><th>O que aconteceu</th><th>Onde mexer</th></tr></thead>
+          <tbody>
+            <tr><td>Falha de busca</td><td>O trecho com a resposta não foi recuperado.</td><td>Divisão do material ou as buscas</td></tr>
+            <tr><td>Falha de resposta</td><td>O trecho veio e a resposta saiu errada.</td><td>Prompt, modelo ou trechos confusos</td></tr>
+            <tr><td>Informação inventada</td><td>Citou valor que não está nos trechos, ou respondeu o que o PDF não diz.</td><td>Prompt e modelo</td></tr>
+            <tr><td>Recusa indevida</td><td>O trecho veio e ele disse que não tem a informação.</td><td>Prompt</td></tr>
+            <tr><td>Violação de regra</td><td>Fatos certos, mas citou "contexto" ou "documento", ou respondeu fora do português.</td><td>Prompt</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>O bloco <b>Comportamento (juiz)</b> é a opinião do llama3 sobre tom, objetividade e convite ao agendamento. Ele não entra na nota geral e ainda não foi conferido com você.</p>
+    </section>
+
+    <section id="bancada">
+      <h2>Bancada de busca</h2>
+      <p>A avaliação acima mede a resposta. A bancada mede só a busca, para escolher como dividir e buscar o material. Ela roda cada experimento de <code>config/experiments.yaml</code> sobre as 38 perguntas com resposta e mostra uma tabela. Estes são os números de 10/10/2026.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Experimento</th><th>Divisão</th><th>Busca</th><th>True Rate</th><th>Score</th><th>Ancorada</th><th>Tempo</th></tr></thead>
+          <tbody>
+            <tr><td><code>section_hybrid</code> (em uso)</td><td>por seção</td><td>híbrida</td><td class="num">37/38</td><td class="num">0,67</td><td class="num">100%</td><td class="num">39 ms</td></tr>
+            <tr><td><code>section_bm25</code></td><td>por seção</td><td>por palavras</td><td class="num">37/38</td><td class="num">0,65</td><td class="num">100%</td><td class="num">33 ms</td></tr>
+            <tr><td><code>page_hybrid</code></td><td>por página</td><td>híbrida</td><td class="num">37/38</td><td class="num">0,64</td><td class="num">81,8%</td><td class="num">36 ms</td></tr>
+            <tr><td><code>section_vector</code></td><td>por seção</td><td>vetorial</td><td class="num">35/38</td><td class="num">0,66</td><td class="num">97,0%</td><td class="num">35 ms</td></tr>
+            <tr><td><code>recursive_500_200_hybrid</code></td><td>500 caracteres</td><td>híbrida</td><td class="num">31/38</td><td class="num">0,67</td><td class="num">81,8%</td><td class="num">35 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li><b>True Rate</b> é a coluna que mede acerto: perguntas em que todas as evidências do gabarito vieram entre os trechos.</li>
+        <li><b>Score</b> é a similaridade média entre a pergunta e os trechos. Ele não mede acerto: a divisão por 500 caracteres tem o mesmo Score da divisão por seção e erra 6 perguntas a mais.</li>
+        <li><b>Ancorada</b> diz se o trecho com a resposta também traz o nome do tratamento.</li>
+      </ul>
+      <p>Duas opções foram medidas e não adotadas. Com <b>threshold</b> de 0,6, a evidência deixou de chegar em mais 2 perguntas (35/38). Com <b>HyDE</b>, o True Rate ficou igual (37/38) e a busca passou de 39 ms para cerca de 1,8 s por pergunta. As duas ficaram como exemplo comentado no arquivo de experimentos.</p>
+      <h3>Trocar a configuração do assistente</h3>
+      <p>Em <code>config/experiments.yaml</code>, a linha <code>assistant:</code> diz qual experimento o chat usa. Para adotar outro, troque o nome e confirme com a avaliação da resposta, porque a bancada não vê o que o modelo responde.</p>
+      <div class="cmd">
+        <div class="cmd-bar"><span>Medir a resposta de um experimento antes de adotar</span><button class="copy" type="button">Copiar</button></div>
+<pre>python -m evaluation run --no-judge --experiment page_hybrid</pre>
+      </div>
+      <p>Cada execução da bancada grava dois arquivos CSV em <code>evaluation/runs/experiments/</code>: a tabela, e uma linha por pergunta, que mostra onde cada experimento erra.</p>
+    </section>
+
+    <section id="ciclo">
+      <h2>Ciclo de melhoria</h2>
+      <p>É assim que o projeto foi pensado para ser usado daqui em diante.</p>
+      <ol class="cycle">
+        <li><div><b>Faça uma mudança de cada vez</b><span>Por exemplo, uma regra do prompt em <code>assistant/pipeline.py</code>. Com duas mudanças juntas você não sabe qual ajudou.</span></div></li>
+        <li><div><b>Recrie os índices, se mudou uma estratégia ou o PDF</b><code>python -m assistant.ingest</code></div></li>
+        <li><div><b>Se a mudança é de busca, compare na bancada</b><code>python -m evaluation kb-check</code><code>python -m evaluation experiments</code></div></li>
+        <li><div><b>Rode a avaliação com um rótulo</b><code>python -m evaluation run --no-judge --label o-que-mudei</code><span>O placar termina com a comparação contra a referência: regressões primeiro, depois as métricas e as melhorias.</span></div></li>
+        <li><div><b>Olhe as regressões antes da nota</b><span>Uma mudança pode subir a nota geral e fazer errar perguntas que antes acertava.</span></div></li>
+        <li><div><b>Se a mudança ficou, ela vira a nova referência</b><code>python -m evaluation baseline set</code></div></li>
+      </ol>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Outros comandos</th><th>Para quê</th></tr></thead>
+          <tbody>
+            <tr><td><code>python -m evaluation list</code></td><td>Ver todas as execuções gravadas e qual é a referência.</td></tr>
+            <tr><td><code>python -m evaluation compare A B</code></td><td>Comparar duas execuções quaisquer pelo id.</td></tr>
+            <tr><td><code>python -m evaluation run --experiment NOME</code></td><td>Avaliar a resposta com outro experimento, sem editar o arquivo.</td></tr>
+            <tr><td><code>python -m evaluation run --repeat 3</code></td><td>Rodar 3 vezes e ver quanto cada métrica varia.</td></tr>
+            <tr><td><code>python -m evaluation validate</code></td><td>Conferir o gabarito depois de editá-lo.</td></tr>
+            <tr><td><code>python -m evaluation run --holdout</code></td><td>Rodar a parte reservada, só depois de uma rodada de melhorias.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="arquivos">
+      <h2>Mapa de arquivos</h2>
+      <div class="tabs" role="tablist" aria-label="Pastas do projeto">
+        <button type="button" role="tab" id="tab-assistant" aria-controls="panel-assistant" aria-selected="true">assistant/</button>
+        <button type="button" role="tab" id="tab-evaluation" aria-controls="panel-evaluation" aria-selected="false">evaluation/</button>
+        <button type="button" role="tab" id="tab-tests" aria-controls="panel-tests" aria-selected="false">tests/</button>
+        <button type="button" role="tab" id="tab-rest" aria-controls="panel-rest" aria-selected="false">dados e raiz</button>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-assistant" aria-labelledby="tab-assistant">
+        <div><code>config.py</code><p>O que não é parâmetro de experimento: caminhos, modelos, as palavras ignoradas e os sinônimos da busca por palavras, a temperatura e o limite de tamanho da resposta.</p></div>
+        <div><code>settings.py</code><p>Lê e valida <code>config/strategies.yaml</code> e <code>config/experiments.yaml</code>. Um erro de digitação nesses arquivos é recusado aqui, com a mensagem do que corrigir.</p></div>
+        <div><code>index.py</code><p>Onde fica o índice de cada estratégia e se ele ainda corresponde à estratégia declarada e ao PDF. É o que impede usar um índice desatualizado.</p></div>
+        <div><code>ingest.py</code><p>Lê o PDF, limpa o texto e divide conforme a estratégia (por seção, por caracteres ou por página). Cria um índice por estratégia, sem tocar nos outros.</p></div>
+        <div><code>pipeline.py</code><p>O assistente em si. Guarda as regras de atendimento (o prompt) e as funções <code>retrieve()</code>, que faz a busca conforme o experimento (tipo de busca, quantidade de trechos, threshold, HyDE), <code>answer()</code>, que monta o prompt e chama o modelo, e <code>stream_answer()</code>, que entrega a resposta aos poucos.</p></div>
+        <div><code>chat.py</code><p>O laço de conversa no terminal. Só lê a pergunta e imprime a resposta enquanto ela é escrita.</p></div>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-evaluation" aria-labelledby="tab-evaluation" hidden>
+        <div><code>data/gabarito.json</code><p>As 60 perguntas, com os fatos esperados e a linha do PDF onde está a resposta. É o arquivo mais importante da avaliação, e o único que você edita à mão.</p></div>
+        <div><code>cli.py</code><p>Os comandos: <code>run</code>, <code>compare</code>, <code>baseline</code>, <code>list</code>, <code>kb-check</code>, <code>validate</code>, <code>calibrate</code>.</p></div>
+        <div><code>dataset.py</code><p>Carrega e valida o gabarito, e separa os recortes: trabalho, reservado e reduzido.</p></div>
+        <div><code>normalize.py</code><p>Extrai dinheiro e prazos de um texto, incluindo números por extenso, e os deixa comparáveis.</p></div>
+        <div><code>answer_metrics.py</code><p>Confere a resposta: fatos presentes, valores estranhos, valores fora dos trechos, recusa e regras de atendimento. A lista de frases de recusa fica aqui.</p></div>
+        <div><code>retrieval_metrics.py</code><p>Confere a busca: a evidência veio, em que posição, e com o nome do procedimento junto.</p></div>
+        <div><code>diagnose.py</code><p>Decide a causa de cada pergunta errada.</p></div>
+        <div><code>runner.py</code><p>Roda as perguntas no assistente, uma a uma, e monta o resultado de cada uma. Trata a execução interrompida.</p></div>
+        <div><code>aggregate.py</code><p>Transforma os resultados em notas: geral, por métrica, por tipo de pergunta e por procedimento.</p></div>
+        <div><code>history.py</code><p>Grava e lê as execuções e a referência.</p></div>
+        <div><code>compare.py</code><p>Calcula a diferença entre duas execuções: métricas, regressões e melhorias.</p></div>
+        <div><code>report.py</code><p>Desenha o placar no terminal e escreve o <code>report.md</code>.</p></div>
+        <div><code>judge.py</code><p>O juiz: as rubricas de tom, objetividade, agendamento, relevância e fidelidade, e a chamada ao modelo.</p></div>
+        <div><code>calibrate.py</code><p>Gera a amostra para você avaliar e calcula quanto o juiz concorda com você.</p></div>
+        <div><code>kb_checks.py</code><p>As verificações do índice que não usam modelo.</p></div>
+        <div><code>experiments.py</code><p>A bancada: roda cada experimento sobre o gabarito, calcula True Rate, Score, evidência ancorada e tempo, ordena e grava os CSV.</p></div>
+        <div><code>runs/</code><p>Uma pasta por execução, com <code>run.json</code> e <code>report.md</code>, mais o <code>baseline.json</code>, que aponta a referência. É o histórico da evolução do assistente.</p></div>
+        <div><code>README.md</code><p>O manual da avaliação, com mais detalhe do que este guia.</p></div>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-tests" aria-labelledby="tab-tests" hidden>
+        <div><code>unit/</code><p>Um arquivo de teste para cada módulo da avaliação, mais os do assistente: configuração, índice, divisão, busca e prompt. <code>test_shortcuts.py</code> confere que o <code>Makefile</code> e o <code>run.ps1</code> têm os mesmos atalhos. Rodam sem o Ollama.</p></div>
+        <div><code>unit/conftest.py</code><p>Um gabarito pequeno e resultados de exemplo, usados por vários testes.</p></div>
+        <div><code>integration/test_assistant.py</code><p>Usa o Ollama e os índices de verdade: confere que cada índice está em dia com a sua estratégia e com o PDF, que um preço sai certo, que ele recusa o que não sabe e que importar os módulos não abre o chat.</p></div>
+        <div><code>fixtures/factual_examples.json</code><p>20 respostas com formatos variados de valores e prazos e o veredito esperado. Bom lugar para acrescentar um caso quando a conferência errar.</p></div>
+      </div>
+
+      <div class="files" role="tabpanel" id="panel-rest" aria-labelledby="tab-rest" hidden>
+        <div><code>config/strategies.yaml</code><p>As formas de dividir o material. Acrescentar uma estratégia de um tipo existente é só editar este arquivo.</p></div>
+        <div><code>config/experiments.yaml</code><p>As configurações de busca e a linha <code>assistant:</code>, que diz qual delas o chat usa.</p></div>
+        <div><code>run.ps1</code> e <code>Makefile</code><p>Os atalhos dos comandos, com os mesmos nomes nos dois.</p></div>
+        <div><code>data/source/OdontoTest.pdf</code><p>O material da clínica. É a única fonte de verdade do assistente.</p></div>
+        <div><code>data/index/</code><p>Um diretório por estratégia, gerado pelo <code>ingest</code>, com o banco vetorial, os trechos e um manifesto. Fica fora do git e pode ser apagado e recriado.</p></div>
+        <div><code>specs/</code><p>A especificação, o plano, as decisões técnicas e as tarefas de cada feature: <code>001</code> é a avaliação e <code>002</code> é a bancada. Leia <code>research.md</code> para entender por que cada métrica foi feita assim.</p></div>
+        <div><code>README.md</code><p>Instalação e comandos principais.</p></div>
+        <div><code>.env.example</code><p>Modelo para o <code>.env</code>, caso queira trocar os modelos ou o endereço do Ollama.</p></div>
+        <div><code>requirements.txt</code><p>As dependências, com versão fixa.</p></div>
+        <div><code>pytest.ini</code><p>Configuração dos testes. Faz o <code>pytest</code> puro pular os de integração.</p></div>
+      </div>
+    </section>
+
+    <section id="mexer">
+      <h2>Onde mexer</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Quero</th><th>Arquivo</th><th>Depois</th></tr></thead>
+          <tbody>
+            <tr><td>Ensinar um sinônimo à busca ("orçamento" quer dizer "investimento")</td><td><code>assistant/config.py</code></td><td>Rodar <code>retrieval</code> e a avaliação</td></tr>
+            <tr><td>Testar outra divisão do material</td><td><code>config/strategies.yaml</code></td><td>Rodar o <code>ingest</code>, acrescentar um experimento e rodar <code>experiments</code></td></tr>
+            <tr><td>Criar um tipo novo de divisão</td><td><code>assistant/ingest.py</code></td><td>Registrar em <code>STRATEGY_TYPES</code> e no esquema de <code>config/schemas/</code></td></tr>
+            <tr><td>Mudar o tipo de busca, a quantidade de trechos, o threshold ou o HyDE</td><td><code>config/experiments.yaml</code></td><td>Rodar <code>experiments</code> e depois a avaliação</td></tr>
+            <tr><td>Trocar a configuração que o chat usa</td><td><code>config/experiments.yaml</code>, linha <code>assistant:</code></td><td>Rodar a avaliação e comparar com a referência</td></tr>
+            <tr><td>Mudar as regras de atendimento ou a frase de recusa</td><td><code>assistant/pipeline.py</code></td><td>Rodar a avaliação; se a frase de recusa mudar, atualizar <code>answer_metrics.py</code></td></tr>
+            <tr><td>Mudar como as buscas são combinadas</td><td><code>assistant/pipeline.py</code></td><td>Rodar <code>experiments</code> e a avaliação</td></tr>
+            <tr><td>Trocar o modelo</td><td><code>.env</code></td><td>Baixar o modelo com <code>ollama pull</code> e rodar a avaliação</td></tr>
+            <tr><td>Atualizar o material da clínica</td><td><code>data/source/</code></td><td>Rodar o <code>ingest</code>, conferir com <code>kb-check</code> se as seções saíram certas e revisar o gabarito</td></tr>
+            <tr><td>Acrescentar ou corrigir uma pergunta</td><td><code>evaluation/data/gabarito.json</code></td><td>Subir a <code>version</code>, rodar <code>validate</code> e marcar nova referência</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="cuidados">
+      <h2>Cuidados</h2>
+      <ul>
+        <li><b>Uma ou duas perguntas de diferença não são melhoria.</b> O llama3 pode mudar o texto de uma resposta entre uma execução e outra, mesmo recebendo os mesmos trechos. Só leve a sério diferenças que se repitam em duas execuções.</li>
+        <li><b>Um erro conhecido ficou.</b> "Os tratamentos de vocês doem?" não recupera o trecho dos diferenciais ("tecnologia moderna e menos dor"), e a resposta sai fraca. É o único erro das 46 perguntas.</li>
+        <li><b>"Titânio" foi corrigido por fora.</b> No PDF a palavra está corrompida ("■■■ânio"). A correção está em <code>TEXT_FIXES</code>, no <code>config.py</code>. O certo é corrigir o PDF.</li>
+        <li><b>A bancada não vê a resposta.</b> Dois experimentos com o mesmo True Rate podem dar respostas de qualidade diferente. Antes de adotar um, rode a avaliação com <code>--experiment</code>.</li>
+        <li><b>Índice desatualizado é recusado.</b> Se você mudar uma estratégia ou trocar o PDF, o chat e a avaliação param e dizem qual comando rodar.</li>
+        <li><b>A divisão por seção depende dos títulos.</b> As seções são reconhecidas por linhas com as palavras em maiúscula inicial. Um PDF novo com outro formato pode ser dividido errado: confira sempre com o <code>kb-check</code>.</li>
+        <li><b>Não olhe a parte reservada durante os ajustes.</b> As 14 perguntas de <code>--holdout</code> existem para confirmar, no fim, que a melhoria vale para perguntas que não guiaram as mudanças. A nota delas hoje é 100% (14 de 14); antes das melhorias era 42,9%.</li>
+        <li><b>As notas do juiz não são confiáveis.</b> Ele deu 4% de objetividade para respostas de uma ou duas frases. Ignore esse bloco do placar até você avaliar as 20 respostas de <code>evaluation/data/human_labels.json</code> e rodar <code>python -m evaluation calibrate score</code>.</li>
+        <li><b>O gabarito ainda não foi revisado por você.</b> As perguntas foram escritas a partir do PDF. Dois itens têm uma decisão em aberto no campo <code>notes</code>: <code>fora-botox-01</code> e <code>adv-desconto-01</code>.</li>
+        <li><b>A conferência é por valor.</b> Se a resposta atribuir o tempo da limpeza ao clareamento e os dois valores forem fatos válidos para a pergunta, a nota não percebe.</li>
+        <li><b>Nada foi commitado ainda.</b> Tudo está só na sua pasta de trabalho.</li>
+      </ul>
+    </section>
+
+    <footer>Números medidos em 10/10/2026 com llama3 e o experimento section_hybrid.</footer>
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll(".copy").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var pre = button.closest(".cmd").querySelector("pre");
+      var text = Array.from(pre.childNodes).map(function (node) {
+        return node.nodeType === 1 && node.classList.contains("c") ? "" : node.textContent;
+      }).join("").split("\n").map(function (line) { return line.trimEnd(); }).join("\n").trim();
+      function done(label) {
+        button.textContent = label;
+        setTimeout(function () { button.textContent = "Copiar"; }, 1600);
+      }
+      function selectInstead() {
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        done("Selecionado");
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done("Copiado"); }, selectInstead);
+      } else {
+        selectInstead();
+      }
+    });
+  });
+
+  var tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      tabs.forEach(function (other) {
+        var selected = other === tab;
+        other.setAttribute("aria-selected", selected ? "true" : "false");
+        document.getElementById(other.getAttribute("aria-controls")).hidden = !selected;
+      });
+    });
+  });
+</script>
