@@ -1,0 +1,6 @@
+﻿experiment;search_type;collection;match_threshold;match_count;use_hyde;score;hits;total;true_rate;anchored_rate;avg_latency_ms;status;reason;gabarito_version;embedding_model
+section_hybrid;hybrid;section;0.00;4;false;0.6721;37;38;0.9737;1.0000;40.9;ok;;2026-10-10.1;nomic-embed-text
+section_bm25;bm25;section;0.00;4;false;0.6544;37;38;0.9737;1.0000;33.4;ok;;2026-10-10.1;nomic-embed-text
+page_hybrid;hybrid;page;0.00;4;false;0.6420;37;38;0.9737;0.8182;36.4;ok;;2026-10-10.1;nomic-embed-text
+section_vector;vector;section;0.00;4;false;0.6647;35;38;0.9211;0.9697;35.3;ok;;2026-10-10.1;nomic-embed-text
+recursive_500_200_hybrid;hybrid;recursive_500_200;0.00;4;false;0.6692;31;38;0.8158;0.8182;35.8;ok;;2026-10-10.1;nomic-embed-text

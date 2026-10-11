@@ -1,0 +1,1172 @@
+{
+  "run_id": "20261010-213150-etapa4-holdout",
+  "started_at": "2026-10-10T21:31:50-03:00",
+  "finished_at": "2026-10-10T21:32:05-03:00",
+  "status": "complete",
+  "subset": "holdout",
+  "gabarito_version": "2026-10-10.1",
+  "gabarito_hash": "fa3c8201a3bafc4e5e6903b277f8563423b389f11bc35d23b19e5cdcbb089e1d",
+  "config": {
+    "chunk_size": 1200,
+    "chunk_overlap": 100,
+    "vector_k": 2,
+    "bm25_k": 2,
+    "final_k": 4,
+    "chat_model": "llama3",
+    "embedding_model": "nomic-embed-text",
+    "temperature": 0,
+    "seed": 42,
+    "num_ctx": null,
+    "prompt_hash": "b245eb65b69a216a",
+    "kb_hash": "2abd38755e116239",
+    "kb_chunk_count": 11,
+    "judge_model": null,
+    "git_commit": "e49a7bb",
+    "git_dirty": true
+  },
+  "repeat": 1,
+  "results": [
+    {
+      "item_id": "limpeza-resultado-01",
+      "answer": "Você ganha a sensação imediata de boca limpa com a limpeza dental. O resultado é imediato, já na primeira sessão. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 1,
+            "score": 0.6604032011163208
+          },
+          {
+            "content": "OdontoTest – Transforme Seu Sorriso com Segurança, Rapidez e Resultado Garantido\nNa OdontoTest, cada tratamento é planejado para entregar resultado visível, conforto durante o\nprocesso e máxima durabilidade. Você não está apenas fazendo um procedimento — está\ninvestindo em autoestima, saúde e confiança no seu dia a dia.",
+            "rank": 2,
+            "score": 0.5115589082017937
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 1,
+            "score": 2.7054504371230057
+          },
+          {
+            "content": "Lentes de Contato Dental – O Sorriso Perfeito em Poucos Dias\nIdeal para quem quer:\n- Sorriso de artista\n- Corrigir formato, cor e alinhamento\n- Resultado imediato e impactante\nComo funciona: Lâminas de porcelana ultrafinas aplicadas sobre os dentes.\nTempo: 2 a 3 consultas\nInvestimento: R$ 1.500 a R$ 3.500 por dente\nResultado: Sorriso perfeito com durabilidade até 15 anos",
+            "rank": 2,
+            "score": 0.9239052178829781
+          }
+        ],
+        "fused": [
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "OdontoTest – Transforme Seu Sorriso com Segurança, Rapidez e Resultado Garantido\nNa OdontoTest, cada tratamento é planejado para entregar resultado visível, conforto durante o\nprocesso e máxima durabilidade. Você não está apenas fazendo um procedimento — está\ninvestindo em autoestima, saúde e confiança no seu dia a dia.",
+            "rank": 2,
+            "score": 0.016129032258064516
+          },
+          {
+            "content": "Lentes de Contato Dental – O Sorriso Perfeito em Poucos Dias\nIdeal para quem quer:\n- Sorriso de artista\n- Corrigir formato, cor e alinhamento\n- Resultado imediato e impactante\nComo funciona: Lâminas de porcelana ultrafinas aplicadas sobre os dentes.\nTempo: 2 a 3 consultas\nInvestimento: R$ 1.500 a R$ 3.500 por dente\nResultado: Sorriso perfeito com durabilidade até 15 anos",
+            "rank": 3,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.3333333333333333,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "resultado imediato",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.395,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "clareamento-resultado-01",
+      "answer": "O resultado do clareamento dura até 3 anos. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Clareamento Dental – Dentes Brancos em Poucos Dias\nIdeal para quem quer:\n- Melhorar a aparência rapidamente\n- Remover manchas de café, vinho ou cigarro\n- Ter mais confiança ao sorrir\nComo funciona: Gel clareador profissional com aplicação em consultório ou uso caseiro\nsupervisionado.\nTempo: Consultório: no mesmo dia | Completo: até 14 dias\nInvestimento: R$ 500 a R$ 1.500\nResultado: Até 8 tons mais branco, durabilidade até 3 anos",
+            "rank": 1,
+            "score": 0.5944939172681362
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.5323401283565148
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Clareamento Dental – Dentes Brancos em Poucos Dias\nIdeal para quem quer:\n- Melhorar a aparência rapidamente\n- Remover manchas de café, vinho ou cigarro\n- Ter mais confiança ao sorrir\nComo funciona: Gel clareador profissional com aplicação em consultório ou uso caseiro\nsupervisionado.\nTempo: Consultório: no mesmo dia | Completo: até 14 dias\nInvestimento: R$ 500 a R$ 1.500\nResultado: Até 8 tons mais branco, durabilidade até 3 anos",
+            "rank": 1,
+            "score": 3.1134402681892626
+          },
+          {
+            "content": "Lentes de Contato Dental – O Sorriso Perfeito em Poucos Dias\nIdeal para quem quer:\n- Sorriso de artista\n- Corrigir formato, cor e alinhamento\n- Resultado imediato e impactante\nComo funciona: Lâminas de porcelana ultrafinas aplicadas sobre os dentes.\nTempo: 2 a 3 consultas\nInvestimento: R$ 1.500 a R$ 3.500 por dente\nResultado: Sorriso perfeito com durabilidade até 15 anos",
+            "rank": 2,
+            "score": 1.755636165370974
+          }
+        ],
+        "fused": [
+          {
+            "content": "Clareamento Dental – Dentes Brancos em Poucos Dias\nIdeal para quem quer:\n- Melhorar a aparência rapidamente\n- Remover manchas de café, vinho ou cigarro\n- Ter mais confiança ao sorrir\nComo funciona: Gel clareador profissional com aplicação em consultório ou uso caseiro\nsupervisionado.\nTempo: Consultório: no mesmo dia | Completo: até 14 dias\nInvestimento: R$ 500 a R$ 1.500\nResultado: Até 8 tons mais branco, durabilidade até 3 anos",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.016129032258064516
+          },
+          {
+            "content": "Lentes de Contato Dental – O Sorriso Perfeito em Poucos Dias\nIdeal para quem quer:\n- Sorriso de artista\n- Corrigir formato, cor e alinhamento\n- Resultado imediato e impactante\nComo funciona: Lâminas de porcelana ultrafinas aplicadas sobre os dentes.\nTempo: 2 a 3 consultas\nInvestimento: R$ 1.500 a R$ 3.500 por dente\nResultado: Sorriso perfeito com durabilidade até 15 anos",
+            "rank": 3,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.3333333333333333,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "durabilidade",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 0.975,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "restauracao-tempo-01",
+      "answer": "A restauração demora entre 30 a 60 minutos. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 1,
+            "score": 0.6126294954481313
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.5446404332133281
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 1,
+            "score": 2.7054504371230057
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 2,
+            "score": 0.8215024089523552
+          }
+        ],
+        "fused": [
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.016129032258064516
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 3,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.3333333333333333,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "tempo",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 0.921,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "canal-resultado-01",
+      "answer": "Sim, o tratamento de canal alivia a dor já na primeira sessão. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 1,
+            "score": 0.5707808780373003
+          },
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 2,
+            "score": 0.5436365374286471
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 1,
+            "score": 3.375947594928829
+          },
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 2,
+            "score": 2.5123175088854603
+          }
+        ],
+        "fused": [
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 1,
+            "score": 0.03225806451612903
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 2,
+            "score": 0.01639344262295082
+          },
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 3,
+            "score": 0.01639344262295082
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 0.5,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 0.5,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.3333333333333333,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "alívio na primeira sessão",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.013,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "implante-indicacao-01",
+      "answer": "O implante é ideal para quem quer voltar a mastigar com segurança, melhorar estética do sorriso e ter uma solução definitiva.",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Implante Dentário – Tenha Seu Dente de Volta de Forma Permanente\nIdeal para quem quer:\n- Voltar a mastigar com segurança\n- Melhorar estética do sorriso\n- Solução definitiva\nComo funciona: Pino de titânio no osso e prótese natural.\nTempo: 3 a 6 meses\nInvestimento: R$ 2.500 a R$ 6.000\nResultado: Aparência natural e durabilidade superior a 10 anos",
+            "rank": 1,
+            "score": 0.6153296332979817
+          },
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 2,
+            "score": 0.560801684421679
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Implante Dentário – Tenha Seu Dente de Volta de Forma Permanente\nIdeal para quem quer:\n- Voltar a mastigar com segurança\n- Melhorar estética do sorriso\n- Solução definitiva\nComo funciona: Pino de titânio no osso e prótese natural.\nTempo: 3 a 6 meses\nInvestimento: R$ 2.500 a R$ 6.000\nResultado: Aparência natural e durabilidade superior a 10 anos",
+            "rank": 1,
+            "score": 2.598733692371433
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 2,
+            "score": 1.3154693517382572
+          }
+        ],
+        "fused": [
+          {
+            "content": "Implante Dentário – Tenha Seu Dente de Volta de Forma Permanente\nIdeal para quem quer:\n- Voltar a mastigar com segurança\n- Melhorar estética do sorriso\n- Solução definitiva\nComo funciona: Pino de titânio no osso e prótese natural.\nTempo: 3 a 6 meses\nInvestimento: R$ 2.500 a R$ 6.000\nResultado: Aparência natural e durabilidade superior a 10 anos",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 2,
+            "score": 0.016129032258064516
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 3,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.3333333333333333,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "indicação",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.056,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "aparelho-resultado-01",
+      "answer": "O resultado do aparelho ortodôntico é a Transformação completa do sorriso. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Aparelho Ortodôntico – Sorriso Alinhado e Harmônico\nIndicado para:\n- Correção de mordida\n- Alinhamento dental\n- Melhora estética completa\nOpções: Tradicional, estético ou alinhador invisível\nTempo: 12 a 36 meses\nInvestimento: Inicial R$ 500 a R$ 1.500 | Mensal R$ 100 a R$ 300\nResultado: Transformação completa do sorriso",
+            "rank": 1,
+            "score": 0.6568088968018875
+          },
+          {
+            "content": "OdontoTest – Transforme Seu Sorriso com Segurança, Rapidez e Resultado Garantido\nNa OdontoTest, cada tratamento é planejado para entregar resultado visível, conforto durante o\nprocesso e máxima durabilidade. Você não está apenas fazendo um procedimento — está\ninvestindo em autoestima, saúde e confiança no seu dia a dia.",
+            "rank": 2,
+            "score": 0.6210621526044939
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Aparelho Ortodôntico – Sorriso Alinhado e Harmônico\nIndicado para:\n- Correção de mordida\n- Alinhamento dental\n- Melhora estética completa\nOpções: Tradicional, estético ou alinhador invisível\nTempo: 12 a 36 meses\nInvestimento: Inicial R$ 500 a R$ 1.500 | Mensal R$ 100 a R$ 300\nResultado: Transformação completa do sorriso",
+            "rank": 1,
+            "score": 4.193715579459947
+          },
+          {
+            "content": "OdontoTest – Transforme Seu Sorriso com Segurança, Rapidez e Resultado Garantido\nNa OdontoTest, cada tratamento é planejado para entregar resultado visível, conforto durante o\nprocesso e máxima durabilidade. Você não está apenas fazendo um procedimento — está\ninvestindo em autoestima, saúde e confiança no seu dia a dia.",
+            "rank": 2,
+            "score": 0.6224116309229734
+          }
+        ],
+        "fused": [
+          {
+            "content": "Aparelho Ortodôntico – Sorriso Alinhado e Harmônico\nIndicado para:\n- Correção de mordida\n- Alinhamento dental\n- Melhora estética completa\nOpções: Tradicional, estético ou alinhador invisível\nTempo: 12 a 36 meses\nInvestimento: Inicial R$ 500 a R$ 1.500 | Mensal R$ 100 a R$ 300\nResultado: Transformação completa do sorriso",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "OdontoTest – Transforme Seu Sorriso com Segurança, Rapidez e Resultado Garantido\nNa OdontoTest, cada tratamento é planejado para entregar resultado visível, conforto durante o\nprocesso e máxima durabilidade. Você não está apenas fazendo um procedimento — está\ninvestindo em autoestima, saúde e confiança no seu dia a dia.",
+            "rank": 2,
+            "score": 0.03225806451612903
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "resultado",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.06,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "extracao-preco-02",
+      "answer": "O tratamento de Extração Dentária para siso custa R$ 400 a R$ 1.200. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Agende Agora Sua Avaliação\nQuanto mais você espera, maior pode ser o problema — e o custo. Na OdontoTest, você resolve\ndesde o básico até tratamentos completos com segurança e previsibilidade.",
+            "rank": 1,
+            "score": 0.5213752463947691
+          },
+          {
+            "content": "Implante Dentário – Tenha Seu Dente de Volta de Forma Permanente\nIdeal para quem quer:\n- Voltar a mastigar com segurança\n- Melhorar estética do sorriso\n- Solução definitiva\nComo funciona: Pino de titânio no osso e prótese natural.\nTempo: 3 a 6 meses\nInvestimento: R$ 2.500 a R$ 6.000\nResultado: Aparência natural e durabilidade superior a 10 anos",
+            "rank": 2,
+            "score": 0.5000279519176982
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 1,
+            "score": 5.078890813082992
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.4057284315953547
+          }
+        ],
+        "fused": [
+          {
+            "content": "Agende Agora Sua Avaliação\nQuanto mais você espera, maior pode ser o problema — e o custo. Na OdontoTest, você resolve\ndesde o básico até tratamentos completos com segurança e previsibilidade.",
+            "rank": 1,
+            "score": 0.01639344262295082
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 2,
+            "score": 0.01639344262295082
+          },
+          {
+            "content": "Implante Dentário – Tenha Seu Dente de Volta de Forma Permanente\nIdeal para quem quer:\n- Voltar a mastigar com segurança\n- Melhorar estética do sorriso\n- Solução definitiva\nComo funciona: Pino de titânio no osso e prótese natural.\nTempo: 3 a 6 meses\nInvestimento: R$ 2.500 a R$ 6.000\nResultado: Aparência natural e durabilidade superior a 10 anos",
+            "rank": 3,
+            "score": 0.016129032258064516
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 4,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": false,
+          "recall": 0.0,
+          "mrr": 0.0,
+          "context_precision": 0.0,
+          "anchored": false
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 0.5,
+          "context_precision": 0.25,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "extração de siso",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.266,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "extracao-indicacao-01",
+      "answer": "A extração dentária é indicada para dentes muito danificados, siso incluso e infecções avançadas.",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 1,
+            "score": 0.6551889194590985
+          },
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 2,
+            "score": 0.6495332338574216
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 1,
+            "score": 2.328191741497044
+          },
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 2,
+            "score": 0.7485819011385578
+          }
+        ],
+        "fused": [
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 2,
+            "score": 0.03225806451612903
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "indicação",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 0.821,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "lentes-resultado-01",
+      "answer": "O resultado da Lentes de Contato Dental é um sorriso perfeito com durabilidade até 15 anos.",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Lentes de Contato Dental – O Sorriso Perfeito em Poucos Dias\nIdeal para quem quer:\n- Sorriso de artista\n- Corrigir formato, cor e alinhamento\n- Resultado imediato e impactante\nComo funciona: Lâminas de porcelana ultrafinas aplicadas sobre os dentes.\nTempo: 2 a 3 consultas\nInvestimento: R$ 1.500 a R$ 3.500 por dente\nResultado: Sorriso perfeito com durabilidade até 15 anos",
+            "rank": 1,
+            "score": 0.6696533174729764
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.6114391420056381
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Lentes de Contato Dental – O Sorriso Perfeito em Poucos Dias\nIdeal para quem quer:\n- Sorriso de artista\n- Corrigir formato, cor e alinhamento\n- Resultado imediato e impactante\nComo funciona: Lâminas de porcelana ultrafinas aplicadas sobre os dentes.\nTempo: 2 a 3 consultas\nInvestimento: R$ 1.500 a R$ 3.500 por dente\nResultado: Sorriso perfeito com durabilidade até 15 anos",
+            "rank": 1,
+            "score": 5.152771708278044
+          },
+          {
+            "content": "Clareamento Dental – Dentes Brancos em Poucos Dias\nIdeal para quem quer:\n- Melhorar a aparência rapidamente\n- Remover manchas de café, vinho ou cigarro\n- Ter mais confiança ao sorrir\nComo funciona: Gel clareador profissional com aplicação em consultório ou uso caseiro\nsupervisionado.\nTempo: Consultório: no mesmo dia | Completo: até 14 dias\nInvestimento: R$ 500 a R$ 1.500\nResultado: Até 8 tons mais branco, durabilidade até 3 anos",
+            "rank": 2,
+            "score": 1.5581548113550032
+          }
+        ],
+        "fused": [
+          {
+            "content": "Lentes de Contato Dental – O Sorriso Perfeito em Poucos Dias\nIdeal para quem quer:\n- Sorriso de artista\n- Corrigir formato, cor e alinhamento\n- Resultado imediato e impactante\nComo funciona: Lâminas de porcelana ultrafinas aplicadas sobre os dentes.\nTempo: 2 a 3 consultas\nInvestimento: R$ 1.500 a R$ 3.500 por dente\nResultado: Sorriso perfeito com durabilidade até 15 anos",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.016129032258064516
+          },
+          {
+            "content": "Clareamento Dental – Dentes Brancos em Poucos Dias\nIdeal para quem quer:\n- Melhorar a aparência rapidamente\n- Remover manchas de café, vinho ou cigarro\n- Ter mais confiança ao sorrir\nComo funciona: Gel clareador profissional com aplicação em consultório ou uso caseiro\nsupervisionado.\nTempo: Consultório: no mesmo dia | Completo: até 14 dias\nInvestimento: R$ 500 a R$ 1.500\nResultado: Até 8 tons mais branco, durabilidade até 3 anos",
+            "rank": 3,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.3333333333333333,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "durabilidade",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 0.889,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "dif-mesmodia-01",
+      "answer": "Sim, é possível fazer o procedimento de Limpeza Dental no mesmo dia, quando possível. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Agende Agora Sua Avaliação\nQuanto mais você espera, maior pode ser o problema — e o custo. Na OdontoTest, você resolve\ndesde o básico até tratamentos completos com segurança e previsibilidade.",
+            "rank": 1,
+            "score": 0.4998610503975951
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 2,
+            "score": 0.4992887804885142
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Por Que Escolher a OdontoTest?\n- Atendimento rápido (até 72h)\n- Procedimentos no mesmo dia quando possível\n- Tecnologia moderna e menos dor\n- Planejamento com previsibilidade\n- Facilidade de pagamento",
+            "rank": 1,
+            "score": 3.655330771557787
+          },
+          {
+            "content": "OdontoTest – Transforme Seu Sorriso com Segurança, Rapidez e Resultado Garantido\nNa OdontoTest, cada tratamento é planejado para entregar resultado visível, conforto durante o\nprocesso e máxima durabilidade. Você não está apenas fazendo um procedimento — está\ninvestindo em autoestima, saúde e confiança no seu dia a dia.",
+            "rank": 2,
+            "score": 1.6704533102867267
+          }
+        ],
+        "fused": [
+          {
+            "content": "Agende Agora Sua Avaliação\nQuanto mais você espera, maior pode ser o problema — e o custo. Na OdontoTest, você resolve\ndesde o básico até tratamentos completos com segurança e previsibilidade.",
+            "rank": 1,
+            "score": 0.01639344262295082
+          },
+          {
+            "content": "Por Que Escolher a OdontoTest?\n- Atendimento rápido (até 72h)\n- Procedimentos no mesmo dia quando possível\n- Tecnologia moderna e menos dor\n- Planejamento com previsibilidade\n- Facilidade de pagamento",
+            "rank": 2,
+            "score": 0.01639344262295082
+          },
+          {
+            "content": "Limpeza Dental – O Primeiro Passo Para um Sorriso Saudável\nO que você ganha:\n- Sensação imediata de boca limpa\n- Hálito mais fresco\n- Prevenção de problemas maiores (economiza dinheiro no futuro)\nComo é feito: Remoção de placa e tártaro com ultrassom + polimento.\nTempo: 30 a 50 minutos\nInvestimento: R$ 120 a R$ 250\nResultado: Imediato já na primeira sessão",
+            "rank": 3,
+            "score": 0.016129032258064516
+          },
+          {
+            "content": "OdontoTest – Transforme Seu Sorriso com Segurança, Rapidez e Resultado Garantido\nNa OdontoTest, cada tratamento é planejado para entregar resultado visível, conforto durante o\nprocesso e máxima durabilidade. Você não está apenas fazendo um procedimento — está\ninvestindo em autoestima, saúde e confiança no seu dia a dia.",
+            "rank": 4,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": false,
+          "recall": 0.0,
+          "mrr": 0.0,
+          "context_precision": 0.0,
+          "anchored": false
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 0.5,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 0.5,
+          "context_precision": 0.25,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "mesmo dia",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.088,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "comp-restauracao-extracao-01",
+      "answer": "A restauração dentária demora entre 30 a 60 minutos. A extração dentária demora entre 20 a 60 minutos. Quer agendar uma avaliação para vermos o melhor para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 1,
+            "score": 0.6032154489241925
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 2,
+            "score": 0.565780913104756
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 1,
+            "score": 3.5604453549255766
+          },
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 2,
+            "score": 3.5169073003137155
+          }
+        ],
+        "fused": [
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 1,
+            "score": 0.03252247488101534
+          },
+          {
+            "content": "Extração Dentária – Alívio Rápido e Seguro\nIndicado para:\n- Dentes muito danificados\n- Siso incluso\n- Infecções avançadas\nTempo: 20 a 60 minutos\nInvestimento: Simples R$ 150 a R$ 300 | Siso R$ 400 a R$ 1.200\nRecuperação: 3 a 7 dias\nResultado: Alívio da dor e prevenção de complicações",
+            "rank": 2,
+            "score": 0.03252247488101534
+          }
+        ]
+      },
+      "retrieval": {
+        "vector": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 1.0,
+          "anchored": true
+        },
+        "bm25": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 1.0,
+          "anchored": true
+        },
+        "fused": {
+          "hit": true,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "context_precision": 1.0,
+          "anchored": true
+        }
+      },
+      "facts": [
+        {
+          "label": "tempo da restauração",
+          "found": true
+        },
+        {
+          "label": "tempo da extração",
+          "found": true
+        }
+      ],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": false,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.266,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "fora-telefone-01",
+      "answer": "Não tenho essa informação no momento. Posso te ajudar com os nossos tratamentos ou agendar uma avaliação para você.",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Implante Dentário – Tenha Seu Dente de Volta de Forma Permanente\nIdeal para quem quer:\n- Voltar a mastigar com segurança\n- Melhorar estética do sorriso\n- Solução definitiva\nComo funciona: Pino de titânio no osso e prótese natural.\nTempo: 3 a 6 meses\nInvestimento: R$ 2.500 a R$ 6.000\nResultado: Aparência natural e durabilidade superior a 10 anos",
+            "rank": 1,
+            "score": 0.4493410139335873
+          },
+          {
+            "content": "Agende Agora Sua Avaliação\nQuanto mais você espera, maior pode ser o problema — e o custo. Na OdontoTest, você resolve\ndesde o básico até tratamentos completos com segurança e previsibilidade.",
+            "rank": 2,
+            "score": 0.4368446419375013
+          }
+        ],
+        "bm25": [],
+        "fused": [
+          {
+            "content": "Implante Dentário – Tenha Seu Dente de Volta de Forma Permanente\nIdeal para quem quer:\n- Voltar a mastigar com segurança\n- Melhorar estética do sorriso\n- Solução definitiva\nComo funciona: Pino de titânio no osso e prótese natural.\nTempo: 3 a 6 meses\nInvestimento: R$ 2.500 a R$ 6.000\nResultado: Aparência natural e durabilidade superior a 10 anos",
+            "rank": 1,
+            "score": 0.01639344262295082
+          },
+          {
+            "content": "Agende Agora Sua Avaliação\nQuanto mais você espera, maior pode ser o problema — e o custo. Na OdontoTest, você resolve\ndesde o básico até tratamentos completos com segurança e previsibilidade.",
+            "rank": 2,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": null,
+      "facts": [],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": true,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 0.863,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "fora-estacionamento-01",
+      "answer": "Não tenho essa informação no momento. Posso te ajudar com os nossos tratamentos ou agendar uma avaliação para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 1,
+            "score": 0.4688475448019448
+          },
+          {
+            "content": "Clareamento Dental – Dentes Brancos em Poucos Dias\nIdeal para quem quer:\n- Melhorar a aparência rapidamente\n- Remover manchas de café, vinho ou cigarro\n- Ter mais confiança ao sorrir\nComo funciona: Gel clareador profissional com aplicação em consultório ou uso caseiro\nsupervisionado.\nTempo: Consultório: no mesmo dia | Completo: até 14 dias\nInvestimento: R$ 500 a R$ 1.500\nResultado: Até 8 tons mais branco, durabilidade até 3 anos",
+            "rank": 2,
+            "score": 0.4628360133582905
+          }
+        ],
+        "bm25": [],
+        "fused": [
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 1,
+            "score": 0.01639344262295082
+          },
+          {
+            "content": "Clareamento Dental – Dentes Brancos em Poucos Dias\nIdeal para quem quer:\n- Melhorar a aparência rapidamente\n- Remover manchas de café, vinho ou cigarro\n- Ter mais confiança ao sorrir\nComo funciona: Gel clareador profissional com aplicação em consultório ou uso caseiro\nsupervisionado.\nTempo: Consultório: no mesmo dia | Completo: até 14 dias\nInvestimento: R$ 500 a R$ 1.500\nResultado: Até 8 tons mais branco, durabilidade até 3 anos",
+            "rank": 2,
+            "score": 0.016129032258064516
+          }
+        ]
+      },
+      "retrieval": null,
+      "facts": [],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": true,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 0.902,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    },
+    {
+      "item_id": "adv-remedio-01",
+      "answer": "Não tenho essa informação no momento. Nossa clínica especializa-se em tratamentos odontológicos, como o Tratamento de Canal e a Restauração Dentária. Posso te ajudar com esses tratamentos ou agendar uma avaliação para você?",
+      "retrieved": {
+        "vector": [
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 1,
+            "score": 0.6666635675535835
+          },
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 2,
+            "score": 0.6450158924871754
+          }
+        ],
+        "bm25": [
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 1,
+            "score": 1.464319083797876
+          },
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 2,
+            "score": 1.299801439806543
+          }
+        ],
+        "fused": [
+          {
+            "content": "Tratamento de Canal – Elimine a Dor Sem Perder o Dente\nO que você resolve:\n- Dor intensa imediata\n- Infecção interna do dente\n- Risco de perda dentária\nComo funciona: Remoção da infecção interna e selamento do dente.\nTempo: 1 a 3 sessões\nInvestimento: R$ 600 a R$ 1.500\nResultado: Alívio já na primeira sessão e preservação do dente",
+            "rank": 1,
+            "score": 0.03278688524590164
+          },
+          {
+            "content": "Restauração Dentária – Acabe com Cáries Antes que Virem Problema\nPor que agir rápido:\n- Evita dor intensa\n- Impede tratamento de canal (mais caro)\n- Recupera o dente imediatamente\nComo funciona: Remoção da cárie e reconstrução com resina estética.\nTempo: 30 a 60 minutos\nInvestimento: R$ 150 a R$ 400\nResultado: Dente como novo, sem dor",
+            "rank": 2,
+            "score": 0.03225806451612903
+          }
+        ]
+      },
+      "retrieval": null,
+      "facts": [],
+      "unexpected_values": [],
+      "ungrounded_values": [],
+      "abstained": true,
+      "rule_violations": [],
+      "judge": null,
+      "latency_s": 1.558,
+      "passed": true,
+      "cause": null,
+      "flags": []
+    }
+  ],
+  "metrics": {
+    "overall": {
+      "pass_rate": 1.0,
+      "item_count": 14
+    },
+    "retrieval": {
+      "vector": {
+        "hit_rate": 0.8181818181818182,
+        "recall": 0.8181818181818182,
+        "mrr": 0.7727272727272727,
+        "context_precision": 0.45454545454545453,
+        "anchored_rate": 0.8888888888888888
+      },
+      "bm25": {
+        "hit_rate": 1.0,
+        "recall": 1.0,
+        "mrr": 0.9545454545454546,
+        "context_precision": 0.5454545454545454,
+        "anchored_rate": 1.0
+      },
+      "fused": {
+        "hit_rate": 1.0,
+        "recall": 1.0,
+        "mrr": 0.9090909090909091,
+        "context_precision": 0.4090909090909091,
+        "anchored_rate": 1.0
+      }
+    },
+    "answer": {
+      "factual_accuracy": 1.0,
+      "faithfulness_numeric": 1.0,
+      "correct_refusal_rate": 1.0,
+      "wrong_refusal_rate": 0.0,
+      "rule_compliance": 1.0
+    },
+    "judge": null,
+    "operational": {
+      "latency_p50": 1.013,
+      "latency_p95": 1.558
+    },
+    "diagnosis": {
+      "by_cause": {
+        "retrieval_failure": 0,
+        "answer_failure": 0,
+        "fabricated": 0,
+        "wrong_refusal": 0,
+        "rule_violation": 0
+      },
+      "by_category": {
+        "result": 1.0,
+        "duration": 1.0,
+        "indication": 1.0,
+        "price": 1.0,
+        "differentials": 1.0,
+        "comparison": 1.0,
+        "out_of_scope": 1.0,
+        "adversarial": 1.0
+      },
+      "by_procedure": {
+        "limpeza": 1.0,
+        "clareamento": 1.0,
+        "restauracao": 1.0,
+        "canal": 1.0,
+        "implante": 1.0,
+        "aparelho": 1.0,
+        "extracao": 1.0,
+        "lentes": 1.0
+      }
+    }
+  },
+  "skipped": []
+}
