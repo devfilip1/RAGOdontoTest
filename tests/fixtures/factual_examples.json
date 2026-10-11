@@ -1,0 +1,129 @@
+[
+  {
+    "name": "faixa com R$ e ponto de milhar",
+    "answer": "O clareamento custa de R$ 500 a R$ 1.500.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": true
+  },
+  {
+    "name": "R$ colado e sem ponto",
+    "answer": "Fica entre R$500 e R$1500, dependendo do caso.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": true
+  },
+  {
+    "name": "reais por extenso depois do número",
+    "answer": "O investimento vai de 500 a 1500 reais.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": true
+  },
+  {
+    "name": "centavos",
+    "answer": "O valor é de R$ 500,00 a R$ 1.500,00.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": true
+  },
+  {
+    "name": "valor por extenso",
+    "answer": "Custa de quinhentos a mil e quinhentos reais.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": true
+  },
+  {
+    "name": "R$ só no primeiro valor da faixa",
+    "answer": "O implante sai por R$ 2.500 a 6.000.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [2500, 6000] }],
+    "expected_verdict": true
+  },
+  {
+    "name": "número com mil",
+    "answer": "O implante custa de 2,5 mil a 6 mil reais.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [2500, 6000] }],
+    "expected_verdict": true
+  },
+  {
+    "name": "preço de outro procedimento (erro conhecido)",
+    "answer": "O clareamento dental custa entre R$ 120 e R$ 250.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": false
+  },
+  {
+    "name": "valor certo junto de valor errado",
+    "answer": "O clareamento custa R$ 500 a R$ 1.500, ou R$ 120 a R$ 250 na promoção.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": false
+  },
+  {
+    "name": "só um dos valores da faixa",
+    "answer": "O clareamento custa a partir de R$ 500.",
+    "expected_facts": [{ "type": "money", "label": "preço", "values": [500, 1500] }],
+    "expected_verdict": false
+  },
+  {
+    "name": "dois fatos de dinheiro",
+    "answer": "A entrada é de R$ 500 a R$ 1.500 e a mensalidade de R$ 100 a R$ 300.",
+    "expected_facts": [
+      { "type": "money", "label": "valor inicial", "values": [500, 1500] },
+      { "type": "money", "label": "mensalidade", "values": [100, 300] }
+    ],
+    "expected_verdict": true
+  },
+  {
+    "name": "faixa de minutos",
+    "answer": "A limpeza leva de 30 a 50 minutos.",
+    "expected_facts": [{ "type": "duration", "label": "tempo", "values": [30, 50], "unit": "minute" }],
+    "expected_verdict": true
+  },
+  {
+    "name": "hora equivale a 60 minutos",
+    "answer": "A restauração demora de 30 minutos a 1 hora.",
+    "expected_facts": [{ "type": "duration", "label": "tempo", "values": [30, 60], "unit": "minute" }],
+    "expected_verdict": true
+  },
+  {
+    "name": "semanas equivalem a dias",
+    "answer": "O clareamento completo leva até 2 semanas.",
+    "expected_facts": [{ "type": "duration", "label": "tempo", "values": [14], "unit": "day" }],
+    "expected_verdict": true
+  },
+  {
+    "name": "horas abreviadas e dias equivalentes",
+    "answer": "Você é atendido em até 72h, ou seja, em 3 dias.",
+    "expected_facts": [{ "type": "duration", "label": "prazo", "values": [72], "unit": "hour" }],
+    "expected_verdict": true
+  },
+  {
+    "name": "anos por extenso",
+    "answer": "O resultado dura até três anos.",
+    "expected_facts": [{ "type": "duration", "label": "durabilidade", "values": [3], "unit": "year" }],
+    "expected_verdict": true
+  },
+  {
+    "name": "sessões por extenso, com artigo que não é número",
+    "answer": "São necessárias de uma a três sessões. Agende uma consulta de avaliação!",
+    "expected_facts": [{ "type": "duration", "label": "sessões", "values": [1, 3], "unit": "session" }],
+    "expected_verdict": true
+  },
+  {
+    "name": "duração de outro procedimento",
+    "answer": "O implante leva de 3 a 6 meses e requer 2 a 3 consultas.",
+    "expected_facts": [{ "type": "duration", "label": "tempo", "values": [3, 6], "unit": "month" }],
+    "expected_verdict": false
+  },
+  {
+    "name": "valor permitido não conta como erro",
+    "answer": "O resultado dura até 3 anos e o tratamento completo leva até 14 dias.",
+    "expected_facts": [{ "type": "duration", "label": "durabilidade", "values": [3], "unit": "year" }],
+    "allowed_facts": [{ "type": "duration", "label": "tempo do tratamento", "values": [14], "unit": "day" }],
+    "expected_verdict": true
+  },
+  {
+    "name": "fato de texto sem acento e com número por extenso",
+    "answer": "Seus dentes ficam ate oito tons mais brancos, com laminas de PORCELANA.",
+    "expected_facts": [
+      { "type": "text", "label": "tons", "alternatives": ["8 tons"] },
+      { "type": "text", "label": "material", "alternatives": ["cerâmica", "porcelana"] }
+    ],
+    "expected_verdict": true
+  }
+]
