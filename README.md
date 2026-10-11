@@ -4,6 +4,8 @@ A local RAG assistant and the bench to measure it.
 
 The example is the virtual assistant of **DentalSafe**, a fictional dental clinic. It answers customer questions from the clinic's brochure (a PDF), using vector and word-based search over the brochure and a local model served by Ollama. Around it, RagLab has what is needed to change a RAG pipeline with numbers instead of guesses: an answer key of 72 questions, deterministic scoring of the answers, a bench that compares chunking and search configurations, and a history of runs to compare before and after.
 
+**Stack:** Python 3.14 · LangChain · Chroma · rank-bm25 · Ollama (`llama3`, `nomic-embed-text`) · pytest
+
 ## Results
 
 Measured on 2026-10-11 with `llama3` and `nomic-embed-text`, all running locally.
@@ -49,7 +51,21 @@ Reproduce it with `python -m evaluation run --no-judge --experiment original_bas
 
 The first version of this project was written in Portuguese, on a Portuguese brochure. Measuring first and changing one thing at a time took its overall score from 54.3% to 97.8%, through section-based chunking (one treatment per chunk), hybrid search with query synonyms, and prompt rules. The project was then moved to English and the numbers above were measured again from scratch on the English brochure.
 
-How to read these numbers, and what they do not measure, is in [evaluation/README.md](evaluation/README.md). A visual walk-through of the pipeline is in [docs/project-guide.html](docs/project-guide.html).
+How to read these numbers, and what they do not measure, is in [evaluation/README.md](evaluation/README.md).
+
+## Documentation
+
+| Document | Answers |
+|---|---|
+| [Overview](docs/README.md) | Map of the documentation and the open questions |
+| [Product](docs/product.md) | What RagLab does, for whom, and the glossary |
+| [Business rules](docs/business-rules.md) | What the assistant may say, how an answer is scored, what makes an answer key valid |
+| [RAG pipeline](docs/rag-pipeline.md) | The path of a question, from the PDF to the scored answer |
+| [Architecture](docs/architecture.md) | Stack, components, data files, risks |
+| [Decisions](docs/decisions/README.md) | Why it is built this way |
+| [Development](docs/development.md) | Running, testing, and common tasks |
+| [Evaluation manual](evaluation/README.md) | Every evaluation command and how to read the scoreboard |
+| [Project guide](docs/project-guide.html) | A visual walk-through, for a first read |
 
 ## Structure
 
@@ -71,7 +87,7 @@ tests/          unit and integration tests
 data/
   source/         the clinic's PDF
   index/          one index per strategy, built by ingest (not in git)
-docs/           project guide
+docs/           documentation (start at docs/README.md)
 ```
 
 ## Setup
